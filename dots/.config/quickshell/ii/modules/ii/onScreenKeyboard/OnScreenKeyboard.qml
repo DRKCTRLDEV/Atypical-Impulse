@@ -20,6 +20,9 @@ Scope { // Scope
         clickedWidth: baseWidth
         clickedHeight: baseHeight + 10
         buttonRadius: Appearance.rounding.normal
+        colBackground: "transparent"
+        colBackgroundHover: Appearance.colors.colLayer1Hover
+        colBackgroundActive: Appearance.colors.colLayer1Active
     }
 
     Loader {

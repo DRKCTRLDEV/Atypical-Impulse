@@ -212,8 +212,8 @@ Item {
 
                     StyledText { // Workspace number text
                         opacity: root.showNumbers
-                            || ((Config.options?.bar.workspaces.alwaysShowNumbers && (!Config.options?.bar.workspaces.showAppIcons || !workspaceButtonBackground.biggestWindow || root.showNumbers))
-                            || (root.showNumbers && !Config.options?.bar.workspaces.showAppIcons)
+                            || ((Config.options?.bar.workspaces.persistentNumbers && (!Config.options?.bar.workspaces.appIcons || !workspaceButtonBackground.biggestWindow || root.showNumbers))
+                            || (root.showNumbers && !Config.options?.bar.workspaces.appIcons)
                             )  ? 1 : 0
                         z: 3
 
@@ -222,7 +222,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         font {
                             pixelSize: Appearance.font.pixelSize.small - ((text.length - 1) * (text !== "10") * 2)
-                            family: Config.options?.bar.workspaces.useNerdFont ? Appearance.font.family.iconNerd : defaultFont
+                            family: Config.options?.bar.workspaces.nerdFont ? Appearance.font.family.iconNerd : defaultFont
                         }
                         text: Config.options?.bar.workspaces.numberMap[button.workspaceValue - 1] || button.workspaceValue
                         elide: Text.ElideRight
@@ -237,9 +237,9 @@ Item {
                     }
                     Rectangle { // Dot instead of ws number
                         id: wsDot
-                        opacity: (Config.options?.bar.workspaces.alwaysShowNumbers
+                        opacity: (Config.options?.bar.workspaces.persistentNumbers
                             || root.showNumbers
-                            || (Config.options?.bar.workspaces.showAppIcons && workspaceButtonBackground.biggestWindow)
+                            || (Config.options?.bar.workspaces.appIcons && workspaceButtonBackground.biggestWindow)
                             ) ? 0 : 1
                         visible: opacity > 0
                         anchors.centerIn: parent
@@ -259,21 +259,21 @@ Item {
                         anchors.centerIn: parent
                         width: workspaceButtonWidth
                         height: workspaceButtonWidth
-                        opacity: !Config.options?.bar.workspaces.showAppIcons ? 0 :
-                            (workspaceButtonBackground.biggestWindow && !root.showNumbers && Config.options?.bar.workspaces.showAppIcons) ? 
+                        opacity: !Config.options?.bar.workspaces.appIcons ? 0 :
+                            (workspaceButtonBackground.biggestWindow && !root.showNumbers && Config.options?.bar.workspaces.appIcons) ? 
                             1 : workspaceButtonBackground.biggestWindow ? workspaceIconOpacityShrinked : 0
                             visible: opacity > 0
                         IconImage {
                             id: mainAppIcon
                             anchors.bottom: parent.bottom
                             anchors.right: parent.right
-                            anchors.bottomMargin: (!root.showNumbers && Config.options?.bar.workspaces.showAppIcons) ? 
+                            anchors.bottomMargin: (!root.showNumbers && Config.options?.bar.workspaces.appIcons) ? 
                                 (workspaceButtonWidth - workspaceIconSize) / 2 : workspaceIconMarginShrinked
-                            anchors.rightMargin: (!root.showNumbers && Config.options?.bar.workspaces.showAppIcons) ? 
+                            anchors.rightMargin: (!root.showNumbers && Config.options?.bar.workspaces.appIcons) ? 
                                 (workspaceButtonWidth - workspaceIconSize) / 2 : workspaceIconMarginShrinked
 
                             source: workspaceButtonBackground.mainAppIconSource
-                            implicitSize: (!root.showNumbers && Config.options?.bar.workspaces.showAppIcons) ? workspaceIconSize : workspaceIconSizeShrinked
+                            implicitSize: (!root.showNumbers && Config.options?.bar.workspaces.appIcons) ? workspaceIconSize : workspaceIconSizeShrinked
 
                             Behavior on opacity {
                                 animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)

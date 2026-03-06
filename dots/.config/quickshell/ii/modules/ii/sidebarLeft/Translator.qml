@@ -21,14 +21,12 @@ Item {
     property var inputTextArea: inputSection.textCanvas.inputTextArea
 
     // Widget variables
-    property bool translationFor: false // Indicates if the translation is for an autocorrected text
     property string translatedText: ""
     property list<string> languages: []
 
     // Options
     property string targetLanguage: Config.options.language.translator.targetLanguage
     property string sourceLanguage: Config.options.language.translator.sourceLanguage
-    property string hostLanguage: targetLanguage
 
     onFocusChanged: focus => {
         if (focus && root.inputTextArea) {

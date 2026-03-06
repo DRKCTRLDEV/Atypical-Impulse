@@ -1,11 +1,11 @@
 import qs
-import qs.services
 import qs.modules.common
+import qs.services
 import QtQuick
-import Quickshell.Io
 import Quickshell
-import Quickshell.Wayland
 import Quickshell.Hyprland
+import Quickshell.Io
+import Quickshell.Wayland
 
 Scope {
     id: root

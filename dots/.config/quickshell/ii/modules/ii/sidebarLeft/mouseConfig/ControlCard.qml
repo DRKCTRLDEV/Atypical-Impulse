@@ -16,32 +16,61 @@ Rectangle {
     implicitHeight: settingsCol.implicitHeight + 24
 
     property string listeningButton: ""
+    property string capturedButton: ""
+    property string capturedAction: ""
     property int maxDpi: Config.options.sidebar.mouseConfig.maxDpi
-    property var editablePresets: RivalCfg.sensitivityPresets && RivalCfg.sensitivityPresets.length > 0 ? RivalCfg.sensitivityPresets.slice() : [800,1600,3200]
+    property var editablePresets: RivalCfg.appliedSensitivity && RivalCfg.appliedSensitivity.length > 0 ? RivalCfg.appliedSensitivity.slice() : [800, 1600, 3200]
+    property var editableBindings: Object.assign({}, RivalCfg.appliedBindings)
     property int selectedIndex: 0
+    readonly property bool dirty: JSON.stringify(editablePresets) !== JSON.stringify(RivalCfg.appliedSensitivity)
+        || JSON.stringify(editableBindings) !== JSON.stringify(RivalCfg.appliedBindings)
 
     signal startListening(string button)
     signal stopListening
+    signal captureProcessed
+
+    onCapturedButtonChanged: {
+        if (capturedButton && capturedAction) {
+            updateBinding(capturedButton, capturedAction)
+            captureProcessed()
+        }
+    }
+
+    function syncFromApplied() {
+        editablePresets = RivalCfg.appliedSensitivity.length > 0 ? RivalCfg.appliedSensitivity.slice() : [800, 1600, 3200]
+        editableBindings = Object.assign({}, RivalCfg.appliedBindings)
+        selectedIndex = Math.min(selectedIndex, Math.max(0, editablePresets.length - 1))
+    }
+
+    function updateBinding(btn, action) {
+        var b = Object.assign({}, editableBindings)
+        b[btn] = action
+        editableBindings = b
+    }
+
+    function applyChanges() {
+        RivalCfg.applyAll(editablePresets, editableBindings)
+    }
+
+    function revertChanges() {
+        syncFromApplied()
+    }
 
     Connections {
         target: RivalCfg
-        function onSensitivityPresetsChanged() {
-            var np = RivalCfg.sensitivityPresets.slice()
-            var cur = editablePresets[selectedIndex]
-            editablePresets = np
-            selectedIndex = cur !== undefined ? Math.max(0, np.indexOf(cur)) : Math.min(selectedIndex, np.length - 1)
-        }
+        function onSettingsLoaded() { root.syncFromApplied() }
+        function onSettingsReset() { root.syncFromApplied() }
     }
 
     Timer {
         id: debounce
-        interval: 350 // Update after 350ms of inactivity
+        interval: 350
         onTriggered: {
             var roundedValue = Math.round(dpiSlider.value)
             if (editablePresets[selectedIndex] !== roundedValue) {
-                editablePresets[selectedIndex] = roundedValue
-                editablePresets = editablePresets
-                RivalCfg.setSensitivity(editablePresets)
+                var np = editablePresets.slice()
+                np[selectedIndex] = roundedValue
+                editablePresets = np
             }
         }
     }
@@ -85,21 +114,29 @@ Rectangle {
                             root.selectedIndex = idx
                         }
                         onPresetRemoveRequested: function(idx) {
-                            if (editablePresets.length <= 1) return // omit last preset
+                            if (editablePresets.length <= 1) return
                             var np = editablePresets.slice()
                             np.splice(idx, 1)
                             editablePresets = np
                             if (root.selectedIndex >= idx && root.selectedIndex > 0) {
                                 root.selectedIndex--
                             }
-                            RivalCfg.setSensitivity(np)
                         }
                     }
                 }
-                PresetChip {
-                    isAddButton: true
-                    canAdd: editablePresets.length < 5
-                    onAddRequested: {
+                GroupButton {
+                    id: addPresetButton
+                    baseWidth: 36; baseHeight: 36
+                    bounce: false
+                    buttonRadius: Appearance.rounding.full
+                    enabled: editablePresets.length < 5
+                    contentItem: MaterialSymbol {
+                        anchors.centerIn: parent
+                        text: "add"
+                        iconSize: Appearance.font.pixelSize.larger + 2
+                        color: Appearance.colors.colOnSecondaryContainer
+                    }
+                    onClicked: {
                         var last = editablePresets[editablePresets.length - 1] || 800
                         var nv = Math.min(last + 400, root.maxDpi)
                         while (editablePresets.includes(nv) && nv < root.maxDpi) nv += 50
@@ -113,7 +150,6 @@ Rectangle {
                         np.sort((a,b)=>a-b)
                         editablePresets = np
                         root.selectedIndex = np.indexOf(nv)
-                        RivalCfg.setSensitivity(np)
                     }
                 }
             }
@@ -130,31 +166,58 @@ Rectangle {
                 delegate: ButtonBindingRow {
                     required property string modelData
                     buttonId: modelData
-                    buttonName: KeyLib.getButtonDisplayName(modelData)
-                    currentAction: RivalCfg.buttonBindings[modelData] || KeyLib.getDefaultAction(modelData)
+                    currentAction: root.editableBindings[modelData] || KeyLib.getDefaultAction(modelData)
                     actionDisplay: KeyLib.getActionDisplay(currentAction)
                     isListening: root.listeningButton === modelData
                     availableActions: KeyLib.getAvailableActionsForButton(modelData, currentAction)
                     onStartListeningClicked: root.startListening(modelData)
-                    onActionSelected: function(a) { RivalCfg.setButtonBinding(modelData, a) }
+                    onActionSelected: function(a) { root.updateBinding(modelData, a) }
                 }
             }
             Rectangle { Layout.fillWidth: true; Layout.margins: 6; implicitHeight: 1; color: Appearance.colors.colLayer3 }
-            RippleButtonWithIcon {
+
+            // Apply / Revert / Reset row
+            RowLayout {
                 Layout.fillWidth: true
-                implicitHeight: 36
-                materialIcon: "restart_alt"
-                mainText: "Reset to Defaults"
-                colBackground: Appearance.colors.colSecondaryContainer
-                colBackgroundHover: Appearance.colors.colErrorContainerHover
-                onClicked: RivalCfg.resetToDefaults()
+                spacing: 6
+                RippleButton {
+                    Layout.fillWidth: true
+                    implicitHeight: 36
+                    materialIcon: "check"
+                    enabled: root.dirty
+                    mainText: "Apply configuration"
+                    onClicked: root.applyChanges()
+                }
+                GroupButton {
+                    baseWidth: 36; baseHeight: 36
+                    bounce: false
+                    enabled: root.dirty
+                    contentItem: MaterialSymbol {
+                        text: "undo"
+                        iconSize: Appearance.font.pixelSize.larger
+                        color: Appearance.colors.colOnSecondaryContainer
+                    }
+                    onClicked: root.revertChanges()
+                    StyledToolTip { text: "Undo changes" }
+                }
+                GroupButton {
+                    baseWidth: 36; baseHeight: 36
+                    bounce: false
+                    colBackgroundHover: Appearance.colors.colErrorContainerHover
+                    contentItem: MaterialSymbol {
+                        text: "restart_alt"
+                        iconSize: Appearance.font.pixelSize.larger
+                        color: Appearance.colors.colOnSecondaryContainer
+                    }
+                    onClicked: RivalCfg.resetToDefaults()
+                    StyledToolTip { text: "Reset to factory defaults" }
+                }
             }
         }
     }
 
     component ButtonBindingRow: RowLayout {
         property string buttonId: ""
-        property string buttonName: ""
         property string currentAction: ""
         property string actionDisplay: ""
         property bool isListening: false
@@ -174,6 +237,7 @@ Rectangle {
         }
         GroupButton {
             baseWidth: 36; baseHeight: 36
+            bounce: false
             colBackground: isListening ? Appearance.colors.colError : Appearance.colors.colSecondaryContainer
             colBackgroundHover: isListening ? Appearance.colors.colErrorContainerHover : Appearance.colors.colSecondaryContainerHover
             colBackgroundActive: isListening ? Appearance.colors.colErrorContainerActive : Appearance.colors.colSecondaryContainerActive
@@ -184,6 +248,7 @@ Rectangle {
                 fill: isListening ? 1 : 0
             }
             onClicked: isListening ? root.stopListening() : startListeningClicked()
+            StyledToolTip { text: isListening ? "Stop recording" : "Record key binding" }
         }
     }
 }

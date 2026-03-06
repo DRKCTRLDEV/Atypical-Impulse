@@ -7,9 +7,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
+
 Item {
     id: root
-    required property var scopeRoot
+    property var scopeRoot
     property int sidebarPadding: 10
     anchors.fill: parent
     property bool translatorEnabled: Config.options.sidebar.translator.enable
@@ -19,7 +20,6 @@ Item {
         ...(root.translatorEnabled ? [{"icon": "translate", "name": Translation.tr("Translator")}] : []),
         ...(root.mouseConfigEnabled ? [{"icon": "mouse", "name": Translation.tr("Mouse")}] : [])
     ]
-    property int tabCount: swipeView.count
     
     // Control service active state based on sidebar visibility
     Connections {
@@ -79,6 +79,7 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 tabButtonList: root.tabButtonList
                 currentIndex: swipeView.currentIndex
+                alwaysExpanded: true
             }
         }
 

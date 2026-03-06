@@ -159,6 +159,9 @@ Item {
                             id: windowButton
                             required property var modelData
                             padding: 0
+                            colBackground: "transparent"
+                            colBackgroundHover: Appearance.colors.colLayer1Hover
+                            colRipple: Appearance.colors.colLayer1Active
                             middleClickAction: () => {
                                 windowButton.modelData?.close();
                             }

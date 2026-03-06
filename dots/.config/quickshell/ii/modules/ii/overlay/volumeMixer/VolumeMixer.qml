@@ -10,8 +10,9 @@ import qs.modules.ii.sidebarRight.volumeMixer
 
 StyledOverlayWidget {
     id: root
-    minimumWidth: 300
+    minimumWidth: 340
     minimumHeight: 380
+    showCenterButton: true
 
     contentItem: OverlayBackground {
         radius: root.contentRadius

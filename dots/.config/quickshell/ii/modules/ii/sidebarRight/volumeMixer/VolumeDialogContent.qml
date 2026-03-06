@@ -1,4 +1,3 @@
-import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
@@ -76,10 +75,5 @@ ColumnLayout {
         clip: true
         spacing: 4
         animateAppearance: false
-    }
-
-    Component {
-        id: listElementComp
-        ListElement {}
     }
 }

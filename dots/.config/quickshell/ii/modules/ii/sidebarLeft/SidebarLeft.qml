@@ -1,10 +1,10 @@
 import qs
-import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.services
 import QtQuick
-import Quickshell.Io
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 
@@ -12,8 +12,6 @@ Scope { // Scope
     id: root
     property bool detach: false
     property bool pin: false
-    property Component contentComponent: SidebarLeftContent {}
-    property Item sidebarContent
 
     function toggleDetach() {
         root.detach = !root.detach;
@@ -58,30 +56,9 @@ Scope { // Scope
         else root.pin = !root.pin;
     }
 
-    Component.onCompleted: {
-        root.sidebarContent = contentComponent.createObject(null, {
-            "scopeRoot": root,
-        });
-        sidebarLoader.item.contentParent.children = [root.sidebarContent];
-    }
-
-    onDetachChanged: {
-        if (root.detach) {
-            sidebarContent.parent = null; // Detach content from sidebar
-            sidebarLoader.active = false; // Unload sidebar
-            detachedSidebarLoader.active = true; // Load detached window
-            detachedSidebarLoader.item.contentParent.children = [sidebarContent];
-        } else {
-            sidebarContent.parent = null; // Detach content from window
-            detachedSidebarLoader.active = false; // Unload detached window
-            sidebarLoader.active = true; // Load sidebar
-            sidebarLoader.item.contentParent.children = [sidebarContent];
-        }
-    }
-
     Loader {
         id: sidebarLoader
-        active: true
+        active: !root.detach
         
         sourceComponent: PanelWindow { // Window
             id: panelWindow
@@ -89,7 +66,6 @@ Scope { // Scope
             
             property bool extend: false
             property real sidebarWidth: panelWindow.extend ? Appearance.sizes.sidebarWidthExtended : Appearance.sizes.sidebarWidth
-            property var contentParent: sidebarLeftBackground
 
             function hide() {
                 GlobalStates.sidebarLeftOpen = false
@@ -164,17 +140,24 @@ Scope { // Scope
                         event.accepted = true;
                     }
                 }
+
+                Loader {
+                    id: sidebarContentLoader
+                    anchors.fill: parent
+                    focus: true
+                    active: GlobalStates.sidebarLeftOpen || (Config?.options.sidebar.keepLeftSidebarLoaded ?? true) || root.pin
+                    sourceComponent: SidebarLeftContent {}
+                }
             }
         }
     }
 
     Loader {
         id: detachedSidebarLoader
-        active: false
+        active: root.detach
 
         sourceComponent: FloatingWindow {
             id: detachedSidebarRoot
-            property var contentParent: detachedSidebarBackground
             color: "transparent"
 
             visible: GlobalStates.sidebarLeftOpen
@@ -194,6 +177,12 @@ Scope { // Scope
                         }
                         event.accepted = true;
                     }
+                }
+
+                Loader {
+                    anchors.fill: parent
+                    active: true
+                    sourceComponent: SidebarLeftContent {}
                 }
             }
         }

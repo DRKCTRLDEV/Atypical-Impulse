@@ -1,7 +1,6 @@
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
-import qs.modules.common.functions
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -37,7 +36,6 @@ Item {
     Loader {
         id: inputLoader
         active: root.isInput
-        visible: root.isInput
         anchors.fill: parent
         sourceComponent: Component {
             Flickable {
@@ -75,7 +73,6 @@ Item {
     Loader {
         id: outputLoader
         active: !root.isInput
-        visible: !root.isInput
         anchors.fill: parent
         sourceComponent: Component {
             Flickable {

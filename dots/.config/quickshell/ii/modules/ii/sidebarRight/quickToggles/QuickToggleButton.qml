@@ -8,8 +8,8 @@ import qs.modules.common.widgets
 
 GroupButton {
     id: root
-    
-    // Info to be passed to by repeater
+
+    // Info passed by repeater
     required property int buttonIndex
     required property var buttonData
     required property bool expandedSize
@@ -18,11 +18,13 @@ GroupButton {
     required property real cellSpacing
     required property int cellSize
 
-    // Signals
     signal openMenu()
 
-    // Declared in specific toggles
-    property QuickToggleModel toggleModel
+    // Set by QuickPanel before/on completion
+    property QuickToggleModel toggleModel: null
+    Component.onCompleted: opacity = 1
+
+    // Model-derived properties
     property string name: toggleModel?.name ?? ""
     property string statusText: (toggleModel?.hasStatusText) ? (toggleModel?.statusText || (toggled ? Translation.tr("Active") : Translation.tr("Inactive"))) : ""
     property string tooltipText: toggleModel?.tooltipText ?? ""
@@ -35,7 +37,8 @@ GroupButton {
     // Edit mode state
     property bool editMode: false
 
-    // Sizing shenanigans
+    // Sizing
+    bounce: false
     baseWidth: root.baseCellWidth * cellSize + cellSpacing * (cellSize - 1)
     baseHeight: root.baseCellHeight
     enableImplicitWidthAnimation: !editMode && root.mouseArea.containsMouse
@@ -47,9 +50,6 @@ GroupButton {
         animation: Appearance.animation.elementMove.numberAnimation.createObject(this)
     }
     opacity: 0
-    Component.onCompleted: {
-        opacity = 1
-    }
     Behavior on opacity {
         animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
     }
@@ -59,23 +59,24 @@ GroupButton {
     horizontalPadding: padding
     verticalPadding: padding
 
+    // Unified visual style
     colBackground: Appearance.colors.colLayer2
-    colBackgroundToggled: (altAction && expandedSize) ? Appearance.colors.colLayer2 : Appearance.colors.colPrimary
-    colBackgroundToggledHover: (altAction && expandedSize) ? Appearance.colors.colLayer2Hover : Appearance.colors.colPrimaryHover
-    colBackgroundToggledActive: (altAction && expandedSize) ? Appearance.colors.colLayer2Active : Appearance.colors.colPrimaryActive
-    buttonRadius: toggled ? Appearance.rounding.large : height / 2
-    buttonRadiusPressed: Appearance.rounding.normal
-    property color colText: (toggled && !(altAction && expandedSize) && enabled) ? Appearance.colors.colOnPrimary : ColorUtils.transparentize(Appearance.colors.colOnLayer2, enabled ? 0 : 0.7)
+    colBackgroundToggled: expandedSize ? Appearance.colors.colLayer2 : Appearance.colors.colPrimary
+    colBackgroundToggledHover: expandedSize ? Appearance.colors.colLayer2Hover : Appearance.colors.colPrimaryHover
+    colBackgroundToggledActive: expandedSize ? Appearance.colors.colLayer2Active : Appearance.colors.colPrimaryActive
+    buttonRadius: Appearance.rounding.normal
+    buttonRadiusPressed: Appearance.rounding.small
+    property color colText: (toggled && !expandedSize && enabled) ? Appearance.colors.colOnPrimary : ColorUtils.transparentize(Appearance.colors.colOnLayer2, enabled ? 0 : 0.7)
     property color colIcon: expandedSize ? ((root.toggled) ? Appearance.colors.colOnPrimary : Appearance.colors.colOnLayer3) : colText
 
     onClicked: {
         if (root.expandedSize && root.altAction) root.altAction();
-        else root.mainAction();
+        else if (root.mainAction) root.mainAction();
     }
 
     contentItem: RowLayout {
         id: contentItem
-        spacing: 4
+        spacing: 8
         anchors {
             centerIn: root.expandedSize ? undefined : parent
             fill: root.expandedSize ? parent : undefined
@@ -96,7 +97,9 @@ GroupButton {
             implicitWidth: iconBackground.implicitWidth
             cursorShape: Qt.PointingHandCursor
 
-            onClicked: root.mainAction()
+            onClicked: {
+                if (root.mainAction) root.mainAction();
+            }
 
             Rectangle {
                 id: iconBackground
@@ -105,8 +108,7 @@ GroupButton {
                 radius: root.radius - root.verticalPadding
                 color: {
                     const baseColor = root.toggled ? Appearance.colors.colPrimary : Appearance.colors.colLayer3
-                    const transparentizeAmount = (root.altAction && root.expandedSize) ? 0 : 1
-                    return ColorUtils.transparentize(baseColor, transparentizeAmount)
+                    return ColorUtils.transparentize(baseColor, root.expandedSize ? 0 : 1)
                 }
 
                 Behavior on radius {
@@ -127,7 +129,7 @@ GroupButton {
                 // State layer
                 Loader {
                     anchors.fill: parent
-                    active: (root.expandedSize && root.altAction)
+                    active: root.expandedSize
                     sourceComponent: Rectangle {
                         radius: iconBackground.radius
                         color: ColorUtils.transparentize(root.colIcon, iconMouseArea.containsPress ? 0.88 : iconMouseArea.containsMouse ? 0.95 : 1)
@@ -188,7 +190,7 @@ GroupButton {
 
         function toggleEnabled() {
             const index = root.buttonIndex;
-            const toggleList = Config.options.sidebar.quickToggles.android.toggles;
+            const toggleList = Config.options.sidebar.quickToggles.toggles;
             const buttonType = root.buttonData.type;
             if (!toggleList.find(toggle => toggle.type === buttonType)) {
                 toggleList.push({ type: buttonType, size: 1 });
@@ -199,7 +201,7 @@ GroupButton {
 
         function toggleSize() {
             const index = root.buttonIndex;
-            const toggleList = Config.options.sidebar.quickToggles.android.toggles;
+            const toggleList = Config.options.sidebar.quickToggles.toggles;
             const buttonType = root.buttonData.type;
             if (!toggleList.find(toggle => toggle.type === buttonType)) return;
             toggleList[index].size = 3 - toggleList[index].size; // Alternate between 1 and 2
@@ -207,7 +209,7 @@ GroupButton {
 
         function movePositionBy(offset) {
             const index = root.buttonIndex;
-            const toggleList = Config.options.sidebar.quickToggles.android.toggles;
+            const toggleList = Config.options.sidebar.quickToggles.toggles;
             const buttonType = root.buttonData.type;
             const targetIndex = index + offset;
             if (!toggleList.find(toggle => toggle.type === buttonType)) return;
@@ -228,20 +230,12 @@ GroupButton {
             toggleSize();
         }
         onWheel: (event) => {
-            const index = root.buttonIndex;
-            const toggleList = Config.options.sidebar.quickToggles.android.toggles;
-            const buttonType = root.buttonData.type;
-            if (event.angleDelta.y < 0) { // Move to right
+            if (event.angleDelta.y < 0) {
                 movePositionBy(1);
-            } else if (event.angleDelta.y > 0) { // Move to left
+            } else if (event.angleDelta.y > 0) {
                 movePositionBy(-1);
             }
             event.accepted = true;
         }
-    }
-
-    StyledToolTip {
-        extraVisibleCondition: root.tooltipText !== ""
-        text: root.tooltipText
     }
 }

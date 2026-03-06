@@ -9,6 +9,9 @@ RippleButton {
 
     implicitHeight: 30
     implicitWidth: implicitHeight
+    colBackground: "transparent"
+    colBackgroundHover: Appearance.colors.colLayer1Hover
+    colRipple: Appearance.colors.colLayer1Active
 
     Behavior on implicitWidth {
         SmoothedAnimation {

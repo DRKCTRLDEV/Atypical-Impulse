@@ -96,7 +96,7 @@ Scope {
     }
 
     function lock() {
-        if (Config.options.lock.useHyprlock) {
+        if (Config.options.lock.hyprlock) {
             Quickshell.execDetached(["bash", "-c", "pidof hyprlock || hyprlock"]);
             return;
         }

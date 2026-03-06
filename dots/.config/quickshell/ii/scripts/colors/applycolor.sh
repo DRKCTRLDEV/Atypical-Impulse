@@ -60,7 +60,7 @@ apply_qt() {
 # Check if terminal theming is enabled in config
 CONFIG_FILE="$XDG_CONFIG_HOME/illogical-impulse/config.json"
 if [ -f "$CONFIG_FILE" ]; then
-  enable_terminal=$(jq -r '.appearance.wallpaperTheming.enableTerminal' "$CONFIG_FILE")
+  enable_terminal=$(jq -r '.appearance.wallpaperTheming.terminal' "$CONFIG_FILE")
   if [ "$enable_terminal" = "true" ]; then
     apply_term &
   fi

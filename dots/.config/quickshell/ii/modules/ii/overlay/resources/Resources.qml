@@ -13,8 +13,9 @@ import qs.modules.ii.overlay
 
 StyledOverlayWidget {
     id: root
-    minimumWidth: 300
+    minimumWidth: 340
     minimumHeight: 200
+    showCenterButton: true
     property list<var> resources: [
         {
             "icon": "planner_review",

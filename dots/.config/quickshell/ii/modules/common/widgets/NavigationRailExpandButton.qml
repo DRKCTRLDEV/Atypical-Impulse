@@ -9,6 +9,9 @@ RippleButton {
     implicitWidth: 40
     implicitHeight: 40
     Layout.leftMargin: 8
+    colBackground: "transparent"
+    colBackgroundHover: Appearance.colors.colLayer1Hover
+    colRipple: Appearance.colors.colLayer1Active
     downAction: () => {
         parent.expanded = !parent.expanded;
     }

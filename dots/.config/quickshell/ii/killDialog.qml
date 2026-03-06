@@ -123,14 +123,12 @@ ApplicationWindow {
 
         Item {
             // Titlebar
-            visible: Config.options?.windows.showTitlebar
             Layout.fillWidth: true
             implicitHeight: Math.max(welcomeText.implicitHeight, windowControlsRow.implicitHeight)
             StyledText {
                 id: welcomeText
                 anchors {
-                    left: Config.options.windows.centerTitle ? undefined : parent.left
-                    horizontalCenter: Config.options.windows.centerTitle ? parent.horizontalCenter : undefined
+                    horizontalCenter: parent.horizontalCenter
                     verticalCenter: parent.verticalCenter
                     leftMargin: 12
                 }

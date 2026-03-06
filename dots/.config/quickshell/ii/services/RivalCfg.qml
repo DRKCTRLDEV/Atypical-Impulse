@@ -24,9 +24,9 @@ Singleton {
     property int batteryLevel: 100
     property bool isCharging: false
 
-    property var sensitivityPresets: []
-    property var userAppliedPresets: []
-    property var buttonBindings: ({})
+    // Applied state (reflects what's on the device)
+    property var appliedSensitivity: []
+    property var appliedBindings: ({})
 
     property var availableButtons: []
 
@@ -39,6 +39,8 @@ Singleton {
 
     signal settingsApplied()
     signal settingsError(string error)
+    signal settingsLoaded()
+    signal settingsReset()
 
     function looksLikeFactoryDefaults(p) {
         return !p || !p.length || p.every(function(v) { return typeof v === "number" && v >= 400 && v % 400 === 0 })
@@ -52,36 +54,23 @@ Singleton {
         run(["detect"], onDetect)
     }
 
-    function setSensitivity(p) {
-        userAppliedPresets = p.slice()
-        sensitivityPresets = p
-        run(["sensitivity", p.join(",")], onResult)
-    }
-
-    function setButtonBinding(btn, action) {
-        var newBindings = Object.assign({}, buttonBindings)
-        newBindings[btn] = action
-        buttonBindings = newBindings
-        applyButtonBindings()
-    }
-
-    function applyButtonBindings() {
-        var m = {}
-        for (var b in buttonBindings) {
-            m[b] = mapKeyToRivalcfgAlias(buttonBindings[b])
-        }
-        run(["buttons", JSON.stringify(m)], onResult)
-    }
-
-    function mapKeyToRivalcfgAlias(k) {
-        var a = {
-            ";":"semicolon", "'":"quote", ",":"comma", ".":"dot", "/":"slash", "\\":"backslash",
-            "[":"leftbracket", "]":"rightbracket", "`":"backtick", "-":"dash", "=":"equal", "#":"hash",
-            "Shift":"LeftShift", "Ctrl":"LeftCtrl", "Alt":"LeftAlt",
-            "lalt":"LeftAlt", "ralt":"RightAlt", "lctrl":"LeftCtrl", "rctrl":"RightCtrl",
-            "lshift":"LeftShift", "rshift":"RightShift"
-        }
-        return a[k] || k
+    function applyAll(sens, bindings) {
+        var payload = {}
+        if (sens && sens.length > 0) payload.sensitivity = sens
+        if (bindings && Object.keys(bindings).length > 0) payload.buttons = bindings
+        if (Object.keys(payload).length === 0) return
+        var capturedSens = sens ? sens.slice() : []
+        var capturedBindings = bindings ? Object.assign({}, bindings) : {}
+        run(["apply-all", JSON.stringify(payload)], function(data) {
+            var r = parseJson(data)
+            if (r && r.success) {
+                if (capturedSens.length > 0) appliedSensitivity = capturedSens
+                if (Object.keys(capturedBindings).length > 0) appliedBindings = capturedBindings
+                settingsApplied()
+            } else {
+                settingsError(r ? r.error || "Failed" : "Failed")
+            }
+        })
     }
 
     function resetToDefaults() { run(["reset"], onReset) }
@@ -138,30 +127,24 @@ Singleton {
         if (r && r.success && r.settings) {
             var sp = r.settings.sensitivity || []
             if (sp.length > 0) {
-                var hasUser = userAppliedPresets.length > 0
-                if (!hasUser || !looksLikeFactoryDefaults(sp)) {
-                    sensitivityPresets = sp
-                    if (!hasUser && !looksLikeFactoryDefaults(sp)) userAppliedPresets = sp.slice()
-                } else if (hasUser) sensitivityPresets = userAppliedPresets
+                // Keep applied settings if device reports factory-like defaults
+                // (some devices can't report back modified settings)
+                if (appliedSensitivity.length === 0 || !looksLikeFactoryDefaults(sp))
+                    appliedSensitivity = sp
             }
-            if (r.settings.buttons) buttonBindings = r.settings.buttons
+            if (r.settings.buttons && Object.keys(r.settings.buttons).length > 0)
+                appliedBindings = r.settings.buttons
         }
+        settingsLoaded()
         if (hasBattery) batteryTimer.running = true
-    }
-
-    function onResult(data) {
-        var r = parseJson(data)
-        if (r && r.success) settingsApplied()
-        else settingsError(r ? r.error || "Failed" : "Failed")
     }
 
     function onReset(data) {
         var r = parseJson(data)
         if (r && r.success) {
-            buttonBindings = {}
-            sensitivityPresets = [800,1600,3200]
-            userAppliedPresets = []
-            settingsApplied()
+            appliedSensitivity = [800, 1600, 3200]
+            appliedBindings = {}
+            settingsReset()
         } else settingsError(r ? r.error || "Reset failed" : "Reset failed")
     }
 

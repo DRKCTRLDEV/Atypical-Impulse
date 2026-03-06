@@ -13,10 +13,10 @@ Singleton {
     // 10 minute
     readonly property int fetchInterval: Config.options.bar.weather.fetchInterval * 60 * 1000
     readonly property string city: Config.options.bar.weather.city
-    readonly property bool useUSCS: Config.options.bar.weather.useUSCS
-    property bool gpsActive: Config.options.bar.weather.enableGPS
+    readonly property bool imperial: Config.options.bar.weather.imperial
+    property bool gpsActive: Config.options.bar.weather.gps
 
-    onUseUSCSChanged: {
+    onImperialChanged: {
         root.getData();
     }
     onCityChanged: {
@@ -57,7 +57,7 @@ Singleton {
         temp.city = data?.location?.areaName[0]?.value || "City";
         temp.temp = "";
         temp.tempFeelsLike = "";
-        if (root.useUSCS) {
+        if (root.imperial) {
             temp.wind = (data?.current?.windspeedMiles || 0) + " mph";
             temp.precip = (data?.current?.precipInches || 0) + " in";
             temp.visib = (data?.current?.visibilityMiles || 0) + " m";

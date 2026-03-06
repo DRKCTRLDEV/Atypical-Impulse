@@ -12,7 +12,7 @@ ContentPage {
         title: Translation.tr("Music Recognition")
 
         ConfigSpinBox {
-            icon: "timer_off"
+            buttonIcon: "timer_off"
             text: Translation.tr("Total duration timeout (s)")
             value: Config.options.musicRecognition.timeout
             from: 10
@@ -23,7 +23,7 @@ ContentPage {
             }
         }
         ConfigSpinBox {
-            icon: "av_timer"
+            buttonIcon: "av_timer"
             text: Translation.tr("Polling interval (s)")
             value: Config.options.musicRecognition.interval
             from: 2
@@ -55,7 +55,7 @@ ContentPage {
         title: Translation.tr("Resources")
 
         ConfigSpinBox {
-            icon: "av_timer"
+            buttonIcon: "av_timer"
             text: Translation.tr("Polling interval (ms)")
             value: Config.options.resources.updateInterval
             from: 100
@@ -88,6 +88,16 @@ ContentPage {
             wrapMode: TextEdit.Wrap
             onTextChanged: {
                 Config.options.screenSnip.savePath = text;
+            }
+        }
+
+        MaterialTextArea {
+            Layout.fillWidth: true
+            placeholderText: Translation.tr("File manager command (e.g. xdg-open, nautilus, thunar)")
+            text: Config.options.apps.fileManager
+            wrapMode: TextEdit.Wrap
+            onTextChanged: {
+                Config.options.apps.fileManager = text;
             }
         }
     }
@@ -192,14 +202,14 @@ ContentPage {
 
     //     ConfigSwitch {
     //         text: Translation.tr("Enable update checks")
-    //         checked: Config.options.updates.enableCheck
+    //         checked: Config.options.updates.check
     //         onCheckedChanged: {
-    //             Config.options.updates.enableCheck = checked;
+    //             Config.options.updates.check = checked;
     //         }
     //     }
 
     //     ConfigSpinBox {
-    //         icon: "av_timer"
+    //         buttonIcon: "av_timer"
     //         text: Translation.tr("Check interval (mins)")
     //         value: Config.options.updates.checkInterval
     //         from: 60
@@ -218,17 +228,17 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "assistant_navigation"
                 text: Translation.tr("Enable GPS based location")
-                checked: Config.options.bar.weather.enableGPS
+                checked: Config.options.bar.weather.gps
                 onCheckedChanged: {
-                    Config.options.bar.weather.enableGPS = checked;
+                    Config.options.bar.weather.gps = checked;
                 }
             }
             ConfigSwitch {
                 buttonIcon: "thermometer"
                 text: Translation.tr("Fahrenheit unit")
-                checked: Config.options.bar.weather.useUSCS
+                checked: Config.options.bar.weather.imperial
                 onCheckedChanged: {
-                    Config.options.bar.weather.useUSCS = checked;
+                    Config.options.bar.weather.imperial = checked;
                 }
                 StyledToolTip {
                     text: Translation.tr("It may take a few seconds to update")
@@ -246,7 +256,7 @@ ContentPage {
             }
         }
         ConfigSpinBox {
-            icon: "av_timer"
+            buttonIcon: "av_timer"
             text: Translation.tr("Polling interval (m)")
             value: Config.options.bar.weather.fetchInterval
             from: 5

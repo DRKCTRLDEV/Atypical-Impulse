@@ -97,9 +97,9 @@ Singleton {
                     property real contentTransparency: 0.6
                 }
                 property JsonObject wallpaperTheming: JsonObject {
-                    property bool enableAppsAndShell: true
-                    property bool enableQtApps: true
-                    property bool enableTerminal: true
+                    property bool appsAndShell: true
+                    property bool qtApps: true
+                    property bool terminal: true
                     property JsonObject terminalGenerationProps: JsonObject {
                         property real harmony: 0.6
                         property real harmonizeThreshold: 100
@@ -156,9 +156,13 @@ Singleton {
                 property bool floatStyleShadow: true // Show shadow behind bar when cornerStyle == 1 (Float)
                 property bool borderless: false // true for no grouping of items
                 property string topLeftIcon: "spark" // Options: "distro" or any icon name in ~/.config/quickshell/ii/assets/icons
-                property bool showBackground: true
+                property bool background: true
                 property bool verbose: true
                 property bool vertical: false
+                property JsonObject media: JsonObject {
+                    property int maxWidth: 200
+                    property bool noMedia: false
+                }
                 property JsonObject resources: JsonObject {
                     property bool alwaysShowSwap: true
                     property bool alwaysShowCpu: true
@@ -168,33 +172,33 @@ Singleton {
                 }
                 property list<string> screenList: [] // List of names, like "eDP-1", find out with 'hyprctl monitors' command
                 property JsonObject utilButtons: JsonObject {
-                    property bool showScreenSnip: true
-                    property bool showColorPicker: false
-                    property bool showMicToggle: false
-                    property bool showKeyboardToggle: true
-                    property bool showDarkModeToggle: true
-                    property bool showPerformanceProfileToggle: false
-                    property bool showScreenRecord: false
+                    property bool screenSnip: true
+                    property bool colorPicker: false
+                    property bool micToggle: false
+                    property bool keyboardToggle: true
+                    property bool darkModeToggle: true
+                    property bool performanceProfileToggle: false
+                    property bool screenRecord: false
                 }
                 property JsonObject workspaces: JsonObject {
                     property bool monochromeIcons: true
                     property int shown: 10
-                    property bool showAppIcons: true
-                    property bool alwaysShowNumbers: false
+                    property bool appIcons: true
+                    property bool persistentNumbers: false
                     property int showNumberDelay: 300 // milliseconds
                     property list<string> numberMap: ["1", "2"] // Characters to show instead of numbers on workspace indicator
-                    property bool useNerdFont: false
+                    property bool nerdFont: false
                 }
                 property JsonObject weather: JsonObject {
                     property bool enable: true
-                    property bool enableGPS: true // gps based location
-                    property string city: "" // When 'enableGPS' is false
-                    property bool useUSCS: false // Instead of metric (SI) units
+                    property bool gps: true // gps based location
+                    property string city: "" // When 'gps' is false
+                    property bool imperial: false // Instead of metric (SI) units
                     property int fetchInterval: 10 // minutes
                 }
                 property JsonObject indicators: JsonObject {
                     property JsonObject notifications: JsonObject {
-                        property bool showUnreadCount: false
+                        property bool unreadCount: false
                     }
                 }
                 property JsonObject tooltips: JsonObject {
@@ -220,10 +224,10 @@ Singleton {
                 // 5:  | 6:  | 7: 󰣇 | 8:  | 9: 
                 // 10:  | 11:  | 12:  | 13:  | 14: 󱄛
                 property string superKey: ""
-                property bool useMacSymbol: false
+                property bool macSymbol: false
                 property bool splitButtons: false
-                property bool useMouseSymbol: false
-                property bool useFnSymbol: false
+                property bool mouseSymbol: false
+                property bool fnSymbol: false
                 property JsonObject fontSize: JsonObject {
                     property int key: Appearance.font.pixelSize.smaller
                     property int comment: Appearance.font.pixelSize.smaller
@@ -291,7 +295,7 @@ Singleton {
             }
 
             property JsonObject lock: JsonObject {
-                property bool useHyprlock: false
+                property bool hyprlock: false
                 property bool launchOnStartup: false
                 property JsonObject blur: JsonObject {
                     property bool enable: true
@@ -308,6 +312,7 @@ Singleton {
             property JsonObject media: JsonObject {
                 // Attempt to remove dupes (the aggregator playerctl one and browsers' native ones when there's plasma browser integration)
                 property bool filterDuplicatePlayers: true
+                property int updateInterval: 1000
             }
 
             property JsonObject networking: JsonObject {
@@ -331,6 +336,9 @@ Singleton {
                 property bool openingZoomAnimation: true
                 property bool darkenScreen: true
                 property real clickthroughOpacity: 0.8
+                property bool showArrangeButton: true
+                property int gapsOut: 12
+                property int gapsIn: 12
             }
 
             property JsonObject overview: JsonObject {
@@ -344,6 +352,7 @@ Singleton {
             }
 
             property JsonObject regionSelector: JsonObject {
+                property bool circleSelection: false
                 property JsonObject targetRegions: JsonObject {
                     property bool windows: true
                     property bool layers: false
@@ -354,15 +363,22 @@ Singleton {
                     property int selectionPadding: 5
                 }
                 property JsonObject rect: JsonObject {
-                    property bool showAimLines: true
+                    property bool aimLines: true
                 }
                 property JsonObject circle: JsonObject {
                     property int strokeWidth: 6
                     property int padding: 10
                 }
                 property JsonObject annotation: JsonObject {
-                    property bool useSatty: false
+                    property bool satty: false
                 }
+            }
+
+            property JsonObject screenRuler: JsonObject {
+                property int defaultMode: 0 // 0=Crosshair, 1=Horizontal, 2=Vertical, 3=Triangle, 4=Square
+                property bool continuousCapture: false
+                property bool perChannelEdge: false
+                property int edgeTolerance: 30 // 0-255
             }
 
             property JsonObject resources: JsonObject {
@@ -372,7 +388,7 @@ Singleton {
 
             property JsonObject tray: JsonObject {
                 property bool monochromeIcons: true
-                property bool showItemId: false
+                property bool itemId: false
                 property bool invertPinnedItems: true // Makes the below a whitelist for the tray and blacklist for the pinned area
                 property list<var> pinnedItems: ["Fcitx"]
                 property bool filterPassive: true
@@ -389,7 +405,7 @@ Singleton {
                 property list<string> excludedSites: []
                 property bool sloppy: false // Uses levenshtein distance based scoring instead of fuzzy sort. Very weird.
                 property JsonObject prefix: JsonObject {
-                    property bool showDefaultActionsWithoutPrefix: true
+                    property bool defaultActionsWithoutPrefix: true
                     property string action: "/"
                     property string app: ">"
                     property string clipboard: ";"
@@ -400,16 +416,17 @@ Singleton {
                 }
                 property JsonObject imageSearch: JsonObject {
                     property string imageSearchEngineBaseUrl: "https://lens.google.com/uploadbyurl?url="
-                    property bool useCircleSelection: false
                 }
             }
 
             property JsonObject sidebar: JsonObject {
                 property bool keepRightSidebarLoaded: true
+                property bool keepLeftSidebarLoaded: true
+                property bool mediaControls: true
                 property JsonObject translator: JsonObject {
                     property bool enable: false
                     property int delay: 300 // Delay before sending request. Reduces (potential) rate limits and lag.
-                    property bool showCharCount: true // Show character count in translator
+                    property bool charCount: true // Show character count in translator
                 }
                 property JsonObject mouseConfig: JsonObject {
                     property bool enable: true
@@ -428,55 +445,51 @@ Singleton {
                 }
 
                 property JsonObject quickToggles: JsonObject {
-                    property string style: "android" // Options: classic, android
-                    property JsonObject android: JsonObject {
-                        property int columns: 5
-                        property list<var> toggles: [
-                            {
-                                "size": 2,
-                                "type": "network"
-                            },
-                            {
-                                "size": 2,
-                                "type": "bluetooth"
-                            },
-                            {
-                                "size": 1,
-                                "type": "cloudflareWarp"
-                            },
-                            {
-                                "size": 2,
-                                "type": "audio"
-                            },
-                            {
-                                "size": 2,
-                                "type": "mic"
-                            },
-                            {
-                                "size": 1,
-                                "type": "musicRecognition"
-                            },
-                            {
-                                "size": 2,
-                                "type": "idleInhibitor"
-                            },
-                            {
-                                "size": 2,
-                                "type": "nightLight"
-                            },
-                            {
-                                "size": 1,
-                                "type": "gameMode"
-                            }
-                        ]
-                    }
+                    property int columns: 5
+                    property list<var> toggles: [
+                        {
+                            "size": 2,
+                            "type": "network"
+                        },
+                        {
+                            "size": 2,
+                            "type": "bluetooth"
+                        },
+                        {
+                            "size": 1,
+                            "type": "cloudflareWarp"
+                        },
+                        {
+                            "size": 2,
+                            "type": "audio"
+                        },
+                        {
+                            "size": 2,
+                            "type": "mic"
+                        },
+                        {
+                            "size": 1,
+                            "type": "musicRecognition"
+                        },
+                        {
+                            "size": 2,
+                            "type": "idleInhibitor"
+                        },
+                        {
+                            "size": 2,
+                            "type": "nightLight"
+                        },
+                        {
+                            "size": 1,
+                            "type": "gameMode"
+                        }
+                    ]
                 }
 
                 property JsonObject quickSliders: JsonObject {
-                    property bool enable: true
-                    property bool showMic: false
-                    property bool showVolume: true
-                    property bool showBrightness: true
+                    property bool mic: false
+                    property bool volume: true
+                    property bool brightness: true
                 }
             }
 
@@ -506,23 +519,20 @@ Singleton {
                     property int focus: 1500
                     property int longBreak: 900
                 }
-                property bool secondPrecision: false
             }
 
             property JsonObject updates: JsonObject {
-                property bool enableCheck: true
+                property bool check: true
                 property int checkInterval: 120 // minutes
                 property int adviseUpdateThreshold: 75 // packages
                 property int stronglyAdviseUpdateThreshold: 200 // packages
             }
 
             property JsonObject wallpaperSelector: JsonObject {
-                property bool useSystemFileDialog: false
+                property bool systemFileDialog: false
             }
 
             property JsonObject windows: JsonObject {
-                property bool showTitlebar: true // Client-side decoration for shell apps
-                property bool centerTitle: true
             }
 
             property JsonObject hacks: JsonObject {

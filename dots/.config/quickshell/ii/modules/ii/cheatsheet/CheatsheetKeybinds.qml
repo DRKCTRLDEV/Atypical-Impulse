@@ -72,9 +72,9 @@ Item {
       !!Config.options.cheatsheet.superKey ? {
           "Super": Config.options.cheatsheet.superKey,
       }: {},
-      Config.options.cheatsheet.useMacSymbol ? macSymbolMap : {},
-      Config.options.cheatsheet.useFnSymbol ? functionSymbolMap : {},
-      Config.options.cheatsheet.useMouseSymbol ? mouseSymbolMap : {},
+      Config.options.cheatsheet.macSymbol ? macSymbolMap : {},
+      Config.options.cheatsheet.fnSymbol ? functionSymbolMap : {},
+      Config.options.cheatsheet.mouseSymbol ? mouseSymbolMap : {},
     )
 
     Row { // Keybind columns

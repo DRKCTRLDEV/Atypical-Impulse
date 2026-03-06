@@ -66,7 +66,10 @@ Singleton {
         onTriggered: () => {
             const index = root.list.findIndex((notif) => notif.notificationId === notificationId);
             const notifObject = root.list[index];
-            print("[Notifications] Notification timer triggered for ID: " + notificationId + ", transient: " + notifObject?.isTransient);
+            if (!notifObject) {
+                destroy();
+                return;
+            }
             if (notifObject.isTransient) root.discardNotification(notificationId);
             else root.timeoutNotification(notificationId);
             destroy()

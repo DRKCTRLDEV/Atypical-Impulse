@@ -15,6 +15,7 @@ ListView {
     property bool popin: true
     property bool animateAppearance: true
     property bool animateMovement: false
+    property bool smoothScroll: true
     // Accumulated scroll destination so wheel deltas stack while animating
     property real scrollTargetY: 0
 
@@ -52,6 +53,7 @@ ListView {
     }
 
     Behavior on contentY {
+        enabled: root.smoothScroll
         NumberAnimation {
             id: scrollAnim
             alwaysRunToEnd: true

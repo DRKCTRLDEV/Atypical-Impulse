@@ -13,9 +13,9 @@ ContentPage {
         ConfigSwitch {
             buttonIcon: "counter_2"
             text: Translation.tr("Unread indicator: show count")
-            checked: Config.options.bar.indicators.notifications.showUnreadCount
+            checked: Config.options.bar.indicators.notifications.unreadCount
             onCheckedChanged: {
-                Config.options.bar.indicators.notifications.showUnreadCount = checked;
+                Config.options.bar.indicators.notifications.unreadCount = checked;
             }
         }
     }
@@ -173,17 +173,17 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "content_cut"
                 text: Translation.tr("Screen snip")
-                checked: Config.options.bar.utilButtons.showScreenSnip
+                checked: Config.options.bar.utilButtons.screenSnip
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showScreenSnip = checked;
+                    Config.options.bar.utilButtons.screenSnip = checked;
                 }
             }
             ConfigSwitch {
                 buttonIcon: "colorize"
                 text: Translation.tr("Color picker")
-                checked: Config.options.bar.utilButtons.showColorPicker
+                checked: Config.options.bar.utilButtons.colorPicker
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showColorPicker = checked;
+                    Config.options.bar.utilButtons.colorPicker = checked;
                 }
             }
         }
@@ -192,17 +192,17 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "keyboard"
                 text: Translation.tr("Keyboard toggle")
-                checked: Config.options.bar.utilButtons.showKeyboardToggle
+                checked: Config.options.bar.utilButtons.keyboardToggle
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showKeyboardToggle = checked;
+                    Config.options.bar.utilButtons.keyboardToggle = checked;
                 }
             }
             ConfigSwitch {
                 buttonIcon: "mic"
                 text: Translation.tr("Mic toggle")
-                checked: Config.options.bar.utilButtons.showMicToggle
+                checked: Config.options.bar.utilButtons.micToggle
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showMicToggle = checked;
+                    Config.options.bar.utilButtons.micToggle = checked;
                 }
             }
         }
@@ -211,17 +211,17 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "dark_mode"
                 text: Translation.tr("Dark/Light toggle")
-                checked: Config.options.bar.utilButtons.showDarkModeToggle
+                checked: Config.options.bar.utilButtons.darkModeToggle
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showDarkModeToggle = checked;
+                    Config.options.bar.utilButtons.darkModeToggle = checked;
                 }
             }
             ConfigSwitch {
                 buttonIcon: "speed"
                 text: Translation.tr("Performance Profile toggle")
-                checked: Config.options.bar.utilButtons.showPerformanceProfileToggle
+                checked: Config.options.bar.utilButtons.performanceProfileToggle
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showPerformanceProfileToggle = checked;
+                    Config.options.bar.utilButtons.performanceProfileToggle = checked;
                 }
             }
         }
@@ -230,9 +230,9 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "videocam"
                 text: Translation.tr("Record")
-                checked: Config.options.bar.utilButtons.showScreenRecord
+                checked: Config.options.bar.utilButtons.screenRecord
                 onCheckedChanged: {
-                    Config.options.bar.utilButtons.showScreenRecord = checked;
+                    Config.options.bar.utilButtons.screenRecord = checked;
                 }
             }
         }
@@ -258,18 +258,18 @@ ContentPage {
         ConfigSwitch {
             buttonIcon: "counter_1"
             text: Translation.tr('Always show numbers')
-            checked: Config.options.bar.workspaces.alwaysShowNumbers
+            checked: Config.options.bar.workspaces.persistentNumbers
             onCheckedChanged: {
-                Config.options.bar.workspaces.alwaysShowNumbers = checked;
+                Config.options.bar.workspaces.persistentNumbers = checked;
             }
         }
 
         ConfigSwitch {
             buttonIcon: "award_star"
             text: Translation.tr('Show app icons')
-            checked: Config.options.bar.workspaces.showAppIcons
+            checked: Config.options.bar.workspaces.appIcons
             onCheckedChanged: {
-                Config.options.bar.workspaces.showAppIcons = checked;
+                Config.options.bar.workspaces.appIcons = checked;
             }
         }
 
@@ -283,7 +283,7 @@ ContentPage {
         }
 
         ConfigSpinBox {
-            icon: "view_column"
+            buttonIcon: "view_column"
             text: Translation.tr("Workspaces shown")
             value: Config.options.bar.workspaces.shown
             from: 1
@@ -295,7 +295,7 @@ ContentPage {
         }
 
         ConfigSpinBox {
-            icon: "touch_long"
+            buttonIcon: "touch_long"
             text: Translation.tr("Number show delay when pressing Super (ms)")
             value: Config.options.bar.workspaces.showNumberDelay
             from: 0

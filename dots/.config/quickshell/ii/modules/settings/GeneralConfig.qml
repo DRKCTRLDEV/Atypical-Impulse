@@ -34,7 +34,7 @@ ContentPage {
         ConfigRow {
             enabled: Config.options.audio.protection.enable
             ConfigSpinBox {
-                icon: "arrow_warm_up"
+                buttonIcon: "arrow_warm_up"
                 text: Translation.tr("Max allowed increase")
                 value: Config.options.audio.protection.maxAllowedIncrease
                 from: 0
@@ -45,7 +45,7 @@ ContentPage {
                 }
             }
             ConfigSpinBox {
-                icon: "vertical_align_top"
+                buttonIcon: "vertical_align_top"
                 text: Translation.tr("Volume limit")
                 value: Config.options.audio.protection.maxAllowed
                 from: 0
@@ -65,7 +65,7 @@ ContentPage {
         ConfigRow {
             uniform: true
             ConfigSpinBox {
-                icon: "warning"
+                buttonIcon: "warning"
                 text: Translation.tr("Low warning")
                 value: Config.options.battery.low
                 from: 0
@@ -76,7 +76,7 @@ ContentPage {
                 }
             }
             ConfigSpinBox {
-                icon: "dangerous"
+                buttonIcon: "dangerous"
                 text: Translation.tr("Critical warning")
                 value: Config.options.battery.critical
                 from: 0
@@ -116,7 +116,7 @@ ContentPage {
         ConfigRow {
             uniform: true
             ConfigSpinBox {
-                icon: "charger"
+                buttonIcon: "charger"
                 text: Translation.tr("Full warning")
                 value: Config.options.battery.full
                 from: 0
@@ -193,18 +193,6 @@ ContentPage {
     ContentSection {
         icon: "nest_clock_farsight_analog"
         title: Translation.tr("Time")
-
-        ConfigSwitch {
-            buttonIcon: "pace"
-            text: Translation.tr("Second precision")
-            checked: Config.options.time.secondPrecision
-            onCheckedChanged: {
-                Config.options.time.secondPrecision = checked;
-            }
-            StyledToolTip {
-                text: Translation.tr("Enable if you want clocks to show seconds accurately")
-            }
-        }
 
         ContentSubsection {
             title: Translation.tr("Format")

@@ -16,6 +16,9 @@ RippleButton {
 
     toggled: (isToday == 1)
     buttonRadius: Appearance.rounding.small
+    colBackground: "transparent"
+    colBackgroundHover: Appearance.colors.colLayer1Hover
+    colRipple: Appearance.colors.colLayer1Active
     
     contentItem: StyledText {
         anchors.fill: parent

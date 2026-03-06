@@ -26,6 +26,9 @@ AbstractOverlayWidget {
     property bool showCenterButton: false
     property bool showClickabilityButton: true
 
+    // Entrance/exit animation state
+    property bool widgetShowing: false
+
     // Defaults n stuff
     required property var modelData
     readonly property string identifier: modelData.identifier
@@ -35,7 +38,7 @@ AbstractOverlayWidget {
     property real radius: Appearance.rounding.windowRounding
     property real minimumWidth: contentItem.implicitWidth
     property real minimumHeight: contentItem.implicitHeight
-    property real resizeMargin: 8
+    property real resizeMargin: 12
     property real padding: 6
     property real contentRadius: radius - padding
 
@@ -63,12 +66,16 @@ AbstractOverlayWidget {
             return Qt.ArrowCursor;
         } else {
             if (!root.resizable) return Qt.ArrowCursor;
-            const dragIsLeft = mouseX < width / 2
-            const dragIsTop = mouseY < height / 2
-            if ((dragIsLeft && dragIsTop) || (!dragIsLeft && !dragIsTop)) {
-                return Qt.SizeFDiagCursor
+            const xDir = getXResizeDirection(mouseX);
+            const yDir = getYResizeDirection(mouseY);
+            if (xDir !== 0 && yDir !== 0) {
+                // Corner
+                return ((xDir === -1 && yDir === -1) || (xDir === 1 && yDir === 1))
+                    ? Qt.SizeFDiagCursor : Qt.SizeBDiagCursor;
+            } else if (xDir !== 0) {
+                return Qt.SizeHorCursor;
             } else {
-                return Qt.SizeBDiagCursor
+                return Qt.SizeVerCursor;
             }
         }
     }
@@ -79,12 +86,29 @@ AbstractOverlayWidget {
     pinned: persistentStateEntry.pinned
     clickthrough: persistentStateEntry.clickthrough
     drag {
-        minimumX: 0
-        minimumY: 0
-        maximumX: root.parent?.width - root.width
-        maximumY: root.parent?.height - root.height
+        minimumX: OverlayContext.edgeLeft - root.resizeMargin
+        minimumY: OverlayContext.edgeTop - root.resizeMargin
+        maximumX: root.parent ? (root.parent.width - root.width - OverlayContext.edgeRight + root.resizeMargin) : 0
+        maximumY: root.parent ? (root.parent.height - root.height - OverlayContext.edgeBottom + root.resizeMargin) : 0
     }
-    opacity: (GlobalStates.overlayOpen || !clickthrough) ? 1.0 : Config.options.overlay.clickthroughOpacity
+    opacity: ((GlobalStates.overlayOpen || !clickthrough) ? 1.0 : Config.options.overlay.clickthroughOpacity) * (root.widgetShowing ? 1.0 : 0.0)
+    Behavior on opacity {
+        animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
+    }
+
+    scale: root.widgetShowing ? 1.0 : 0.88
+    transformOrigin: Item.Center
+    Behavior on scale {
+        animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
+    }
+
+    Timer {
+        id: closeAnimTimer
+        interval: Appearance.animation.elementMoveFast.duration
+        onTriggered: {
+            Persistent.states.overlay.open = Persistent.states.overlay.open.filter(type => type !== root.identifier);
+        }
+    }
 
     // Guarded states & registration funcs
     property bool open: Persistent.states.overlay.open
@@ -103,6 +127,15 @@ AbstractOverlayWidget {
     Component.onCompleted: {
         reportPinnedState();
         reportClickableState();
+        OverlayContext.registerWidgetInstance(root);
+        Qt.callLater(() => {
+            root.widgetShowing = true;
+            OverlayContext.placeNewWidget(root);
+        });
+    }
+
+    Component.onDestruction: {
+        OverlayContext.unregisterWidgetInstance(root);
     }
 
     // Hooks
@@ -114,15 +147,10 @@ AbstractOverlayWidget {
             root.resizeMargin < event.y && event.y < root.height - root.resizeMargin) {
             return;
         }
-        // Resizing setup
+        // Resizing setup — corners resize both axes, sides resize only one
         root.resizing = true;
         root.resizeXDirection = getXResizeDirection(event.x);
         root.resizeYDirection = getYResizeDirection(event.y);
-        if (root.resizeYDirection !== 0 && root.resizeXDirection === 0) {
-            root.resizeXDirection = event.x < root.width / 2 ? -1 : 1;
-        } else if (root.resizeXDirection !== 0 && root.resizeYDirection === 0) {
-            root.resizeYDirection = event.y < root.height / 2 ? -1 : 1;
-        }
     }
     onPositionChanged: (event) => {
         if (!resizing) return;
@@ -147,14 +175,15 @@ AbstractOverlayWidget {
                 root.savePosition();
             }
         }
-        xAxis.minimum: 0
-        xAxis.maximum: root.parent?.width - root.width
-        yAxis.minimum: 0
-        yAxis.maximum: root.parent?.height - root.height
+        xAxis.minimum: OverlayContext.edgeLeft - root.resizeMargin
+        xAxis.maximum: root.parent ? (root.parent.width - root.width - OverlayContext.edgeRight + root.resizeMargin) : 0
+        yAxis.minimum: OverlayContext.edgeTop - root.resizeMargin
+        yAxis.maximum: root.parent ? (root.parent.height - root.height - OverlayContext.edgeBottom + root.resizeMargin) : 0
     }
 
     function close() {
-        Persistent.states.overlay.open = Persistent.states.overlay.open.filter(type => type !== root.identifier);
+        root.widgetShowing = false;
+        closeAnimTimer.start();
     }
 
     function togglePinned() {
@@ -305,6 +334,9 @@ AbstractOverlayWidget {
         implicitWidth: implicitHeight
         padding: 0
 
+        colBackground: "transparent"
+        colBackgroundHover: Appearance.colors.colLayer1Hover
+        colRipple: Appearance.colors.colLayer1Active
         colBackgroundToggled: Appearance.colors.colSecondaryContainer
         colBackgroundToggledHover: Appearance.colors.colSecondaryContainerHover
         colRippleToggled: Appearance.colors.colSecondaryContainerActive

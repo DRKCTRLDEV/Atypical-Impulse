@@ -12,6 +12,9 @@ RippleButton {
     Layout.fillWidth: true
     implicitHeight: contentItem.implicitHeight + 8 * 2
     font.pixelSize: Appearance.font.pixelSize.small
+    colBackground: "transparent"
+    colBackgroundHover: Appearance.colors.colLayer1Hover
+    colRipple: Appearance.colors.colLayer1Active
     
     onClicked: checked = !checked
 

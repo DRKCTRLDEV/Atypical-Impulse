@@ -249,22 +249,25 @@ RippleButton {
         }
 
         RowLayout {
-            Layout.alignment: Qt.AlignTop
-            Layout.topMargin: root.buttonVerticalPadding
-            Layout.bottomMargin: -root.buttonVerticalPadding // Why is this necessary? Good question.
+            Layout.alignment: Qt.AlignVCenter
             spacing: 4
+            property int clickIndex: -999
             Repeater {
                 model: (root.entry.actions ?? []).slice(0, 4)
-                delegate: RippleButton {
+                delegate: GroupButton {
                     id: actionButton
                     required property var modelData
                     property var iconType: modelData.iconType
                     property string iconName: modelData.iconName ?? ""
-                    implicitHeight: 34
-                    implicitWidth: 34
+                    baseWidth: 34
+                    baseHeight: 34
+                    bounce: false
+                    Layout.fillWidth: false
+                    Layout.fillHeight: false
 
+                    colBackground: "transparent"
                     colBackgroundHover: Appearance.colors.colSecondaryContainerHover
-                    colRipple: Appearance.colors.colSecondaryContainerActive
+                    colBackgroundActive: Appearance.colors.colSecondaryContainerActive
 
                     contentItem: Item {
                         id: actionContentItem

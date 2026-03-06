@@ -45,28 +45,28 @@ ContentPage {
             Layout.fillWidth: true
             spacing: 5
 
-            RippleButtonWithIcon {
+            RippleButton {
                 materialIcon: "auto_stories"
                 mainText: Translation.tr("Documentation")
                 onClicked: {
                     Qt.openUrlExternally(SystemInfo.documentationUrl)
                 }
             }
-            RippleButtonWithIcon {
+            RippleButton {
                 materialIcon: "support"
                 mainText: Translation.tr("Help & Support")
                 onClicked: {
                     Qt.openUrlExternally(SystemInfo.supportUrl)
                 }
             }
-            RippleButtonWithIcon {
+            RippleButton {
                 materialIcon: "bug_report"
                 mainText: Translation.tr("Report a Bug")
                 onClicked: {
                     Qt.openUrlExternally(SystemInfo.bugReportUrl)
                 }
             }
-            RippleButtonWithIcon {
+            RippleButton {
                 materialIcon: "policy"
                 materialIconFill: false
                 mainText: Translation.tr("Privacy Policy")
@@ -114,14 +114,14 @@ ContentPage {
             Layout.fillWidth: true
             spacing: 5
 
-            RippleButtonWithIcon {
+            RippleButton {
                 materialIcon: "auto_stories"
                 mainText: Translation.tr("Documentation")
                 onClicked: {
                     Qt.openUrlExternally("https://end-4.github.io/dots-hyprland-wiki/en/ii-qs/02usage/")
                 }
             }
-            RippleButtonWithIcon {
+            RippleButton {
                 materialIcon: "adjust"
                 materialIconFill: false
                 mainText: Translation.tr("Issues")
@@ -129,14 +129,14 @@ ContentPage {
                     Qt.openUrlExternally("https://github.com/end-4/dots-hyprland/issues")
                 }
             }
-            RippleButtonWithIcon {
+            RippleButton {
                 materialIcon: "forum"
                 mainText: Translation.tr("Discussions")
                 onClicked: {
                     Qt.openUrlExternally("https://github.com/end-4/dots-hyprland/discussions")
                 }
             }
-            RippleButtonWithIcon {
+            RippleButton {
                 materialIcon: "favorite"
                 mainText: Translation.tr("Donate")
                 onClicked: {

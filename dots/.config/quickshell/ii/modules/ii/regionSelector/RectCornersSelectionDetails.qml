@@ -12,7 +12,7 @@ Item {
     required property real mouseY
     required property color color
     required property color overlayColor
-    property bool showAimLines: Config.options.regionSelector.rect.showAimLines
+    property bool aimLines: Config.options.regionSelector.rect.aimLines
 
     // Overlay to darken screen
     // Base dark overlay around region
@@ -82,7 +82,7 @@ Item {
 
     // Coord lines
     Rectangle { // Vertical
-        visible: root.showAimLines
+        visible: root.aimLines
         opacity: 0.2
         z: 2
         x: root.mouseX
@@ -94,7 +94,7 @@ Item {
         color: root.color
     }
     Rectangle { // Horizontal
-        visible: root.showAimLines
+        visible: root.aimLines
         opacity: 0.2
         z: 2
         y: root.mouseY

@@ -114,7 +114,7 @@ ApplicationWindow {
         Config.readWriteDelay = 0; // Settings app always only sets one var at a time so delay isn't needed
     }
 
-    minimumWidth: 750
+    minimumWidth: 800
     minimumHeight: 500
     width: 1100
     height: 750
@@ -158,15 +158,13 @@ ApplicationWindow {
 
         Item {
             // Titlebar
-            visible: Config.options?.windows.showTitlebar
             Layout.fillWidth: true
             Layout.fillHeight: false
             implicitHeight: Math.max(titleText.implicitHeight, windowControlsRow.implicitHeight)
             StyledText {
                 id: titleText
                 anchors {
-                    left: Config.options.windows.centerTitle ? undefined : parent.left
-                    horizontalCenter: Config.options.windows.centerTitle ? parent.horizontalCenter : undefined
+                    horizontalCenter: parent.horizontalCenter
                     verticalCenter: parent.verticalCenter
                     leftMargin: 12
                 }
@@ -206,7 +204,8 @@ ApplicationWindow {
             Item {
                 id: navRailWrapper
                 Layout.fillHeight: true
-                Layout.margins: 5
+                Layout.leftMargin: 5
+                Layout.rightMargin: 5
                 implicitWidth: navRail.expanded ? 150 : 56
                 Behavior on implicitWidth {
                     animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)

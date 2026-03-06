@@ -55,14 +55,12 @@ ApplicationWindow {
 
         Item {
             // Titlebar
-            visible: Config.options?.windows.showTitlebar
             Layout.fillWidth: true
             implicitHeight: Math.max(welcomeText.implicitHeight, windowControlsRow.implicitHeight)
             StyledText {
                 id: welcomeText
                 anchors {
-                    left: Config.options.windows.centerTitle ? undefined : parent.left
-                    horizontalCenter: Config.options.windows.centerTitle ? parent.horizontalCenter : undefined
+                    horizontalCenter: parent.horizontalCenter
                     verticalCenter: parent.verticalCenter
                     leftMargin: 12
                 }
@@ -237,7 +235,7 @@ ApplicationWindow {
 
                     RowLayout {
                         Layout.alignment: Qt.AlignHCenter
-                        RippleButtonWithIcon {
+                        RippleButton {
                             materialIcon: "wallpaper"
                             StyledToolTip {
                                 text: Translation.tr("Pick wallpaper image on your system")
@@ -287,7 +285,7 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         spacing: 5
 
-                        RippleButtonWithIcon {
+                        RippleButton {
                             materialIcon: "keyboard_alt"
                             onClicked: {
                                 Quickshell.execDetached(["qs", "-p", Quickshell.shellPath(""), "ipc", "call", "cheatsheet", "toggle"]);
@@ -317,14 +315,14 @@ ApplicationWindow {
                             }
                         }
 
-                        RippleButtonWithIcon {
+                        RippleButton {
                             materialIcon: "help"
                             mainText: Translation.tr("Usage")
                             onClicked: {
                                 Qt.openUrlExternally("https://end-4.github.io/dots-hyprland-wiki/en/ii-qs/02usage/");
                             }
                         }
-                        RippleButtonWithIcon {
+                        RippleButton {
                             materialIcon: "construction"
                             mainText: Translation.tr("Configuration")
                             onClicked: {
@@ -342,14 +340,14 @@ ApplicationWindow {
                         Layout.fillWidth: true
                         spacing: 5
 
-                        RippleButtonWithIcon {
+                        RippleButton {
                             nerdIcon: "󰊤"
                             mainText: Translation.tr("GitHub")
                             onClicked: {
                                 Qt.openUrlExternally("https://github.com/end-4/dots-hyprland");
                             }
                         }
-                        RippleButtonWithIcon {
+                        RippleButton {
                             materialIcon: "favorite"
                             mainText: "Funny number"
                             onClicked: {

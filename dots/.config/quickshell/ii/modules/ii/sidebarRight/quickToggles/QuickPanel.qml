@@ -1,17 +1,73 @@
+pragma ComponentBehavior: Bound
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common.models.quickToggles
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
+import Quickshell.Services.UPower
+import Quickshell.Io
+import Quickshell.Hyprland
 
-import qs.modules.ii.sidebarRight.quickToggles.androidStyle
-
-AbstractQuickPanel {
+Rectangle {
     id: root
     property bool editMode: false
     Layout.fillWidth: true
+
+    radius: Appearance.rounding.normal
+    color: Appearance.colors.colLayer1
+
+    signal openAudioOutputDialog()
+    signal openAudioInputDialog()
+    signal openBluetoothDialog()
+    signal openNightLightDialog()
+    signal openWifiDialog()
+
+    // Model factory — registered once per panel, not per button
+    Component { id: cNetwork;           NetworkToggle {}          }
+    Component { id: cBluetooth;         BluetoothToggle {}        }
+    Component { id: cDarkMode;          DarkModeToggle {}         }
+    Component { id: cAudio;             AudioToggle {}            }
+    Component { id: cMic;               MicToggle {}              }
+    Component { id: cNightLight;        NightLightToggle {}       }
+    Component { id: cPowerProfile;      PowerProfilesToggle {}    }
+    Component { id: cEasyEffects;       EasyEffectsToggle {}      }
+    Component { id: cIdleInhibitor;     IdleInhibitorToggle {}    }
+    Component { id: cCloudflareWarp;    CloudflareWarpToggle {}   }
+    Component { id: cNotifications;     NotificationToggle {}     }
+    Component { id: cColorPicker;       ColorPickerToggle {}      }
+    Component { id: cOnScreenKeyboard;  OnScreenKeyboardToggle {} }
+    Component { id: cScreenSnip;        ScreenSnipToggle {}       }
+    Component { id: cGameMode;          GameModeToggle {}         }
+    Component { id: cAntiFlashbang;     AntiFlashbangToggle {}    }
+    Component { id: cMusicRecognition;  MusicRecognitionToggle {} }
+
+    readonly property var _modelComponents: ({
+        "network":          cNetwork,
+        "bluetooth":        cBluetooth,
+        "darkMode":         cDarkMode,
+        "audio":            cAudio,
+        "mic":              cMic,
+        "nightLight":       cNightLight,
+        "powerProfile":     cPowerProfile,
+        "easyEffects":      cEasyEffects,
+        "idleInhibitor":    cIdleInhibitor,
+        "cloudflareWarp":   cCloudflareWarp,
+        "notifications":    cNotifications,
+        "colorPicker":      cColorPicker,
+        "onScreenKeyboard": cOnScreenKeyboard,
+        "screenSnip":       cScreenSnip,
+        "gameMode":         cGameMode,
+        "antiFlashbang":    cAntiFlashbang,
+        "musicRecognition": cMusicRecognition,
+    })
+
+    function _makeModel(type, parent) {
+        const comp = root._modelComponents[type];
+        return comp ? comp.createObject(parent) : null;
+    }
 
     // Sizes
     implicitHeight: (editMode ? contentItem.implicitHeight : usedRows.implicitHeight) + root.padding * 2
@@ -30,8 +86,8 @@ AbstractQuickPanel {
 
     // Toggles
     readonly property list<string> availableToggleTypes: ["network", "bluetooth", "idleInhibitor", "easyEffects", "nightLight", "darkMode", "cloudflareWarp", "gameMode", "screenSnip", "colorPicker", "onScreenKeyboard", "mic", "audio", "notifications", "powerProfile","musicRecognition", "antiFlashbang"]
-    readonly property int columns: Config.options.sidebar.quickToggles.android.columns
-    readonly property list<var> toggles: Config.ready ? Config.options.sidebar.quickToggles.android.toggles : []
+    readonly property int columns: Config.options.sidebar.quickToggles.columns
+    readonly property list<var> toggles: Config.ready ? Config.options.sidebar.quickToggles.toggles : []
     readonly property list<var> toggleRows: toggleRowsForList(toggles)
     readonly property list<var> unusedToggles: {
         const types = availableToggleTypes.filter(type => !toggles.some(toggle => (toggle && toggle.type === type)))
@@ -42,7 +98,7 @@ AbstractQuickPanel {
     function toggleRowsForList(togglesList) {
         var rows = [];
         var row = [];
-        var totalSize = 0; // Total cols taken in current row
+        var totalSize = 0;
         for (var i = 0; i < togglesList.length; i++) {
             if (!togglesList[i]) continue;
             if (totalSize + togglesList[i].size > columns) {
@@ -59,6 +115,18 @@ AbstractQuickPanel {
         return rows;
     }
 
+    // Menu signal routing
+    function _routeMenuDialog(type) {
+        switch (type) {
+            case "audio": root.openAudioOutputDialog(); break;
+            case "bluetooth": root.openBluetoothDialog(); break;
+            case "mic": root.openAudioInputDialog(); break;
+            case "network": root.openWifiDialog(); break;
+            case "nightLight":
+            case "antiFlashbang": root.openNightLightDialog(); break;
+        }
+    }
+
     Column {
         id: contentItem
         anchors {
@@ -66,7 +134,7 @@ AbstractQuickPanel {
             margins: root.padding
         }
         spacing: 12
-        
+
         Column {
             id: usedRows
             spacing: root.spacing
@@ -95,17 +163,19 @@ AbstractQuickPanel {
                             values: toggleRow?.modelData ?? []
                             objectProp: "type"
                         }
-                        delegate: AndroidToggleDelegateChooser {
-                            startingIndex: toggleRow.startingIndex
+                        delegate: QuickToggleButton {
+                            required property int index
+                            required property var modelData
+                            buttonIndex: toggleRow.startingIndex + index
+                            buttonData: modelData
                             editMode: root.editMode
+                            expandedSize: modelData.size > 1
                             baseCellWidth: root.baseCellWidth
                             baseCellHeight: root.baseCellHeight
-                            spacing: root.spacing
-                            onOpenAudioOutputDialog: root.openAudioOutputDialog()
-                            onOpenAudioInputDialog: root.openAudioInputDialog()
-                            onOpenBluetoothDialog: root.openBluetoothDialog()
-                            onOpenNightLightDialog: root.openNightLightDialog()
-                            onOpenWifiDialog: root.openWifiDialog()
+                            cellSpacing: root.spacing
+                            cellSize: modelData.size
+                            onOpenMenu: root._routeMenuDialog(modelData.type)
+                            Component.onCompleted: toggleModel = root._makeModel(modelData.type, this)
                         }
                     }
                 }
@@ -147,12 +217,18 @@ AbstractQuickPanel {
                                 values: unusedToggleRow?.modelData ?? []
                                 objectProp: "type"
                             }
-                            delegate: AndroidToggleDelegateChooser {
-                                startingIndex: -1
+                            delegate: QuickToggleButton {
+                                required property int index
+                                required property var modelData
+                                buttonIndex: -1
+                                buttonData: modelData
                                 editMode: root.editMode
+                                expandedSize: modelData.size > 1
                                 baseCellWidth: root.baseCellWidth
                                 baseCellHeight: root.baseCellHeight
-                                spacing: root.spacing
+                                cellSpacing: root.spacing
+                                cellSize: modelData.size
+                                Component.onCompleted: toggleModel = root._makeModel(modelData.type, this)
                             }
                         }
                     }

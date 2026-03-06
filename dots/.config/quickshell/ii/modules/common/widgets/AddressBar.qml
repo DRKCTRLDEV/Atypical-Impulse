@@ -35,10 +35,17 @@ Rectangle {
 
         RippleButton {
             id: parentDirButton
+            implicitWidth: 36
+            implicitHeight: 36
+            horizontalPadding: 0
+            buttonRadius: Appearance.rounding.small
             downAction: () => root.navigateToDirectory(FileUtils.parentDirectory(root.directory))
-            contentItem: MaterialSymbol {
-                text: "drive_folder_upload"
-                iconSize: Appearance.font.pixelSize.larger
+            contentItem: Item {
+                MaterialSymbol {
+                    anchors.centerIn: parent
+                    text: "drive_folder_upload"
+                    iconSize: Appearance.font.pixelSize.larger
+                }
             }
         }
 
@@ -104,12 +111,19 @@ Rectangle {
 
         RippleButton {
             id: dirEditButton
+            implicitWidth: 36
+            implicitHeight: 36
+            horizontalPadding: 0
+            buttonRadius: Appearance.rounding.small
             toggled: !root.showBreadcrumb
             downAction: () => root.showBreadcrumb = !root.showBreadcrumb
-            contentItem: MaterialSymbol {
-                text: "edit"
-                iconSize: Appearance.font.pixelSize.larger
-                color: dirEditButton.toggled ? Appearance.colors.colOnPrimary : Appearance.colors.colOnLayer2
+            contentItem: Item {
+                MaterialSymbol {
+                    anchors.centerIn: parent
+                    text: "edit"
+                    iconSize: Appearance.font.pixelSize.larger
+                    color: dirEditButton.toggled ? Appearance.colors.colOnPrimary : Appearance.colors.colOnLayer2
+                }
             }
 
             StyledToolTip {

@@ -14,7 +14,7 @@ import qs.services.network
 Singleton {
     id: root
 
-    property bool wifi: true
+    property bool wifi: false
     property bool ethernet: false
 
     property bool wifiEnabled: false
@@ -33,25 +33,23 @@ Singleton {
     property string wifiStatus: "disconnected"
 
     property string networkName: ""
-    property int networkStrength
-    property string materialSymbol: root.ethernet
-        ? "lan"
-        : root.wifiEnabled
-            ? (
-                Network.networkStrength > 83 ? "signal_wifi_4_bar" :
-                Network.networkStrength > 67 ? "network_wifi" :
-                Network.networkStrength > 50 ? "network_wifi_3_bar" :
-                Network.networkStrength > 33 ? "network_wifi_2_bar" :
-                Network.networkStrength > 17 ? "network_wifi_1_bar" :
-                "signal_wifi_0_bar"
-            )
-            : (root.wifiStatus === "connecting")
-                ? "signal_wifi_statusbar_not_connected"
-                : (root.wifiStatus === "disconnected")
-                    ? "wifi_find"
-                    : (root.wifiStatus === "disabled")
-                        ? "signal_wifi_off"
-                        : "signal_wifi_bad"
+    readonly property int networkStrength: root.active?.strength ?? 0
+    property string materialSymbol: {
+        if (root.ethernet) return "lan";
+        if (!root.wifiEnabled) return "signal_wifi_off";
+        if (root.wifiStatus === "limited") return "signal_wifi_bad";
+        if (root.active) {
+            const s = root.networkStrength;
+            if (s > 80) return "signal_wifi_4_bar";
+            if (s > 60) return "network_wifi_3_bar";
+            if (s > 40) return "network_wifi_2_bar";
+            if (s > 20) return "network_wifi_1_bar";
+            return "signal_wifi_0_bar";
+        }
+        if (root.wifiStatus === "connecting") return "signal_wifi_statusbar_not_connected";
+        if (root.wifiStatus === "connected") return "network_wifi";
+        return "wifi_find";
+    }
 
     // Control
     function enableWifi(enabled = true): void {
@@ -115,14 +113,16 @@ Singleton {
         stderr: SplitParser {
             onRead: line => {
                 // print("err:", line)
-                if (line.includes("Secrets were required")) {
+                if (root.wifiConnectTarget && line.includes("Secrets were required")) {
                     root.wifiConnectTarget.askingPassword = true
                 }
             }
         }
         onExited: (exitCode, exitStatus) => {
-            root.wifiConnectTarget.askingPassword = (exitCode !== 0)
-            root.wifiConnectTarget = null
+            if (root.wifiConnectTarget) {
+                root.wifiConnectTarget.askingPassword = (exitCode !== 0)
+                root.wifiConnectTarget = null
+            }
         }
     }
 
@@ -157,7 +157,7 @@ Singleton {
         updateConnectionType.startCheck();
         wifiStatusProcess.running = true
         updateNetworkName.running = true;
-        updateNetworkStrength.running = true;
+        getNetworks.running = true;
     }
 
     Process {
@@ -231,17 +231,7 @@ Singleton {
     }
 
     Process {
-        id: updateNetworkStrength
-        running: true
-        command: ["sh", "-c", "nmcli -f IN-USE,SIGNAL,SSID device wifi | awk '/^\*/{if (NR!=1) {print $2}}'"]
-        stdout: SplitParser {
-            onRead: data => {
-                root.networkStrength = parseInt(data);
-            }
-        }
-    }
 
-    Process {
         id: wifiStatusProcess
         command: ["nmcli", "radio", "wifi"]
         Component.onCompleted: running = true

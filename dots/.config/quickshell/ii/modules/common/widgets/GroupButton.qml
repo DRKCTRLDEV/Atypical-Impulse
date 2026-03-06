@@ -36,23 +36,26 @@ Button {
     implicitWidth: (root.down && bounce) ? clickedWidth : baseWidth
     implicitHeight: (root.down && bounce) ? clickedHeight : baseHeight
 
-    property color colBackground: ColorUtils.transparentize(colBackgroundHover, 1) || "transparent"
-    property color colBackgroundHover: Appearance?.colors.colLayer1Hover ?? "#E5DFED"
-    property color colBackgroundActive: Appearance?.colors.colLayer1Active ?? "#D6CEE2"
+    property color colBackground: Appearance?.colors.colSecondaryContainer ?? "#E8DEF8"
+    property color colBackgroundHover: Appearance?.colors.colSecondaryContainerHover ?? "#E5DFED"
+    property color colBackgroundActive: Appearance?.colors.colSecondaryContainerActive ?? "#D6CEE2"
     property color colBackgroundToggled: Appearance?.colors.colPrimary ?? "#65558F"
     property color colBackgroundToggledHover: Appearance?.colors.colPrimaryHover ?? "#77699C"
     property color colBackgroundToggledActive: Appearance?.colors.colPrimaryActive ?? "#D6CEE2"
 
+    opacity: root.enabled ? 1 : 0.4
+    property bool forceFullRadius: false
     property real radius: root.down ? root.buttonRadiusPressed : root.buttonRadius
-    property real leftRadius: root.down ? root.buttonRadiusPressed : root.buttonRadius
-    property real rightRadius: root.down ? root.buttonRadiusPressed : root.buttonRadius
-    property color color: root.enabled ? (root.toggled ? 
+    property real leftRadius: root.forceFullRadius ? root.radius : (root.down ? root.buttonRadiusPressed : root.buttonRadius)
+    property real rightRadius: root.forceFullRadius ? root.radius : (root.down ? root.buttonRadiusPressed : root.buttonRadius)
+    property color color: !root.enabled ? colBackground :
+        root.toggled ? 
         (root.down ? colBackgroundToggledActive : 
             root.hovered ? colBackgroundToggledHover : 
             colBackgroundToggled) :
         (root.down ? colBackgroundActive : 
             root.hovered ? colBackgroundHover : 
-            colBackground)) : colBackground
+            colBackground)
 
     onDownChanged: {
         if (root.down) {
@@ -113,7 +116,6 @@ Button {
         onPressAndHold: () => {
             if (root.altAction) root.altAction();
             root.down = false;
-            root.clicked = false;
         };
     }
 

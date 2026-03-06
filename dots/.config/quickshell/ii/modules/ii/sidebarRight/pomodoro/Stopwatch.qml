@@ -1,9 +1,7 @@
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
-import Qt5Compat.GraphicalEffects
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 
@@ -11,6 +9,15 @@ Item {
     id: stopwatchTab
     Layout.fillWidth: true
     Layout.fillHeight: true
+
+    // Shared time formatting helpers
+    function formatTime(centiseconds) {
+        let totalSeconds = Math.floor(centiseconds) / 100
+        let minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
+        let seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0')
+        let cs = (Math.floor(centiseconds) % 100).toString().padStart(2, '0')
+        return { minutes, seconds, cs }
+    }
 
     Item {
         anchors {
@@ -55,10 +62,8 @@ Item {
                 font.pixelSize: 40
                 color: Appearance.m3colors.m3onSurface
                 text: {
-                    let totalSeconds = Math.floor(TimerService.stopwatchTime) / 100
-                    let minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
-                    let seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0')
-                    return `${minutes}:${seconds}`
+                    let t = stopwatchTab.formatTime(TimerService.stopwatchTime)
+                    return `${t.minutes}:${t.seconds}`
                 }
             }
             StyledText {
@@ -66,7 +71,8 @@ Item {
                 font.pixelSize: 40
                 color: Appearance.colors.colSubtext
                 text: {
-                    return `:<sub>${(Math.floor(TimerService.stopwatchTime) % 100).toString().padStart(2, '0')}</sub>`
+                    let t = stopwatchTab.formatTime(TimerService.stopwatchTime)
+                    return `:<sub>${t.cs}</sub>`
                 }
             }
         }
@@ -121,12 +127,8 @@ Item {
                     StyledText {
                         font.pixelSize: Appearance.font.pixelSize.small
                         text: {
-                            const lapTime = lapItem.modelData
-                            const _10ms = (Math.floor(lapTime) % 100).toString().padStart(2, '0')
-                            const totalSeconds = Math.floor(lapTime) / 100
-                            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
-                            const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0')
-                            return `${minutes}:${seconds}.${_10ms}`
+                            const t = stopwatchTab.formatTime(lapItem.modelData)
+                            return `${t.minutes}:${t.seconds}.${t.cs}`
                         }
                     }
 
@@ -138,12 +140,8 @@ Item {
                         text: {
                             const originalIndex = TimerService.stopwatchLaps.length - lapItem.index - 1
                             const lastTime = originalIndex > 0 ? TimerService.stopwatchLaps[originalIndex - 1] : 0
-                            const lapTime = lapItem.modelData - lastTime
-                            const _10ms = (Math.floor(lapTime) % 100).toString().padStart(2, '0')
-                            const totalSeconds = Math.floor(lapTime) / 100
-                            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0')
-                            const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0')
-                            return `+${minutes == "00" ? "" : minutes + ":"}${seconds}.${_10ms}`
+                            const delta = stopwatchTab.formatTime(lapItem.modelData - lastTime)
+                            return `+${delta.minutes == "00" ? "" : delta.minutes + ":"}${delta.seconds}.${delta.cs}`
                         }
                     }
                 }

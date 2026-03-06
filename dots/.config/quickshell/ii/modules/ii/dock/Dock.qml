@@ -110,6 +110,9 @@ Scope { // Scope
                                     clickedWidth: baseWidth
                                     clickedHeight: baseHeight + 20
                                     buttonRadius: Appearance.rounding.normal
+                                    colBackground: "transparent"
+                                    colBackgroundHover: Appearance.colors.colLayer1Hover
+                                    colBackgroundActive: Appearance.colors.colLayer1Active
                                     toggled: root.pinned
                                     onClicked: root.pinned = !root.pinned
                                     contentItem: MaterialSymbol {

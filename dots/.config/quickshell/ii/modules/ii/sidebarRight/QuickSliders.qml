@@ -1,13 +1,9 @@
-import qs
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Services.UPower
 
 Rectangle {
     id: root
@@ -33,12 +29,9 @@ Rectangle {
         }
 
         Loader {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
+            anchors { left: parent.left; right: parent.right }
             visible: active
-            active: Config.options.sidebar.quickSliders.showBrightness
+            active: Config.options.sidebar.quickSliders.brightness
             sourceComponent: QuickSlider {
                 materialSymbol: "brightness_6"
                 value: (root.brightnessMonitor ? root.brightnessMonitor.brightness : 0)
@@ -49,12 +42,9 @@ Rectangle {
         }
 
         Loader {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
+            anchors { left: parent.left; right: parent.right }
             visible: active
-            active: Config.options.sidebar.quickSliders.showVolume
+            active: Config.options.sidebar.quickSliders.volume
             sourceComponent: QuickSlider {
                 materialSymbol: "volume_up"
                 value: (Audio.sink && Audio.sink.audio ? Audio.sink.audio.volume : 0)
@@ -65,12 +55,9 @@ Rectangle {
         }
 
         Loader {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
+            anchors { left: parent.left; right: parent.right }
             visible: active
-            active: Config.options.sidebar.quickSliders.showMic
+            active: Config.options.sidebar.quickSliders.mic
             sourceComponent: QuickSlider {
                 materialSymbol: "mic"
                 value: (Audio.source && Audio.source.audio ? Audio.source.audio.volume : 0)

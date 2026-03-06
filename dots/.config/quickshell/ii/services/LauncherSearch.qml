@@ -322,7 +322,7 @@ Singleton {
         result = result.concat(launcherActionObjects);
 
         /// Math result, command, web search ///
-        if (Config.options.search.prefix.showDefaultActionsWithoutPrefix) {
+        if (Config.options.search.prefix.defaultActionsWithoutPrefix) {
             if (!startsWithShellCommandPrefix)
                 result.push(commandResultObject);
             if (!startsWithNumber && !startsWithMathPrefix)

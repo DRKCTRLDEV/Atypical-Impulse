@@ -10,8 +10,9 @@ import qs.modules.ii.overlay
 
 StyledOverlayWidget {
     id: root
-    minimumWidth: 310
+    minimumWidth: 340
     minimumHeight: 130
+    showCenterButton: true
 
     contentItem: OverlayBackground {
         id: contentItem
@@ -63,28 +64,62 @@ StyledOverlayWidget {
                 }
             }
 
-            RippleButton {
+            Row {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.fillWidth: false
-                buttonRadius: height / 2
-                colBackground: Appearance.colors.colLayer3
-                colBackgroundHover: Appearance.colors.colLayer3Hover
-                colRipple: Appearance.colors.colLayer3Active
-                onClicked: {
-                    GlobalStates.overlayOpen = false;
-                    Qt.openUrlExternally(`file://${Config.options.screenRecord.savePath}`);
-                }
-                contentItem: Row {
-                    anchors.centerIn: parent
-                    spacing: 6
-                    MaterialSymbol {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "animated_images"
-                        iconSize: 20
+                spacing: 6
+                visible: Config.options.screenRecord.savePath !== "" || Config.options.screenSnip.savePath !== ""
+
+                RippleButton {
+                    visible: Config.options.screenRecord.savePath !== ""
+                    buttonRadius: height / 2
+                    leftPadding: 12
+                    rightPadding: 12
+                    colBackground: Appearance.colors.colLayer3
+                    colBackgroundHover: Appearance.colors.colLayer3Hover
+                    colRipple: Appearance.colors.colLayer3Active
+                    onClicked: {
+                        GlobalStates.overlayOpen = false;
+                        Qt.openUrlExternally(`file://${Config.options.screenRecord.savePath}`);
                     }
-                    StyledText {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: Translation.tr("Open recordings folder")
+                    contentItem: Row {
+                        anchors.centerIn: parent
+                        spacing: 6
+                        MaterialSymbol {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "animated_images"
+                            iconSize: 20
+                        }
+                        StyledText {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: Translation.tr("Open videos")
+                        }
+                    }
+                }
+
+                RippleButton {
+                    visible: Config.options.screenSnip.savePath !== ""
+                    buttonRadius: height / 2
+                    leftPadding: 12
+                    rightPadding: 12
+                    colBackground: Appearance.colors.colLayer3
+                    colBackgroundHover: Appearance.colors.colLayer3Hover
+                    colRipple: Appearance.colors.colLayer3Active
+                    onClicked: {
+                        GlobalStates.overlayOpen = false;
+                        Qt.openUrlExternally(`file://${Config.options.screenSnip.savePath}`);
+                    }
+                    contentItem: Row {
+                        anchors.centerIn: parent
+                        spacing: 6
+                        MaterialSymbol {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "photo_library"
+                            iconSize: 20
+                        }
+                        StyledText {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: Translation.tr("Open pictures")
+                        }
                     }
                 }
             }

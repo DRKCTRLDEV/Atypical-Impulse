@@ -76,7 +76,7 @@ ContentPage {
             }
 
             ColumnLayout {
-                RippleButtonWithIcon {
+                RippleButton {
                     Layout.fillWidth: true
                     materialIcon: "wallpaper"
                     StyledToolTip {
@@ -290,7 +290,7 @@ ContentPage {
         Item {
             Layout.fillWidth: true
         }
-        RippleButtonWithIcon {
+        RippleButton {
             id: copyPathButton
             property bool justCopied: false
             Layout.fillWidth: false

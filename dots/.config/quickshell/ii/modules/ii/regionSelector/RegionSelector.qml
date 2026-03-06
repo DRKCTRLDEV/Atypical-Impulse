@@ -40,58 +40,27 @@ Scope {
         }
     }
 
-    function screenshot() {
-        root.action = RegionSelection.SnipAction.Copy
-        root.selectionMode = RegionSelection.SelectionMode.RectCorners
-        GlobalStates.regionSelectorOpen = true
+    function openWith(action, mode) {
+        root.action = action;
+        root.selectionMode = mode ?? RegionSelection.SelectionMode.RectCorners;
+        GlobalStates.regionSelectorOpen = true;
     }
-
+    function screenshot() { root.openWith(RegionSelection.SnipAction.Copy) }
     function search() {
-        root.action = RegionSelection.SnipAction.Search
-        if (Config.options.search.imageSearch.useCircleSelection) {
-            root.selectionMode = RegionSelection.SelectionMode.Circle
-        } else {
-            root.selectionMode = RegionSelection.SelectionMode.RectCorners
-        }
-        GlobalStates.regionSelectorOpen = true
+        root.openWith(RegionSelection.SnipAction.Search,
+            Config.options.regionSelector.circleSelection ? RegionSelection.SelectionMode.Circle : undefined)
     }
-
-    function ocr() {
-        root.action = RegionSelection.SnipAction.CharRecognition
-        root.selectionMode = RegionSelection.SelectionMode.RectCorners
-        GlobalStates.regionSelectorOpen = true
-    }
-
-    function record() {
-        root.action = RegionSelection.SnipAction.Record
-        root.selectionMode = RegionSelection.SelectionMode.RectCorners
-        GlobalStates.regionSelectorOpen = true
-    }
-
-    function recordWithSound() {
-        root.action = RegionSelection.SnipAction.RecordWithSound
-        root.selectionMode = RegionSelection.SelectionMode.RectCorners
-        GlobalStates.regionSelectorOpen = true
-    }
+    function ocr() { root.openWith(RegionSelection.SnipAction.CharRecognition) }
+    function record() { root.openWith(RegionSelection.SnipAction.Record) }
+    function recordWithSound() { root.openWith(RegionSelection.SnipAction.RecordWithSound) }
 
     IpcHandler {
         target: "region"
-
-        function screenshot() {
-            root.screenshot()
-        }
-        function search() {
-            root.search()
-        }
-        function ocr() {
-            root.ocr()
-        }
-        function record() {
-            root.record()
-        }
-        function recordWithSound() {
-            root.recordWithSound()
-        }
+        function screenshot() { root.screenshot() }
+        function search() { root.search() }
+        function ocr() { root.ocr() }
+        function record() { root.record() }
+        function recordWithSound() { root.recordWithSound() }
     }
 
     GlobalShortcut {

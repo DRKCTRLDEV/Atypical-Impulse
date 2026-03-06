@@ -7,6 +7,9 @@ RippleButton {
     buttonRadius: 0
     implicitHeight: 36
     implicitWidth: buttonTextWidget.implicitWidth + 14 * 2
+    colBackground: "transparent"
+    colBackgroundHover: Appearance.colors.colLayer1Hover
+    colRipple: Appearance.colors.colLayer1Active
 
     contentItem: StyledText {
         id: buttonTextWidget

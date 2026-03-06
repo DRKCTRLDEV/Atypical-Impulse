@@ -3,14 +3,14 @@ import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
 import Quickshell.Hyprland
 
 import qs.modules.ii.sidebarRight.quickToggles
-import qs.modules.ii.sidebarRight.quickToggles.classicStyle
+import qs.modules.ii.mediaControls
+import Quickshell.Services.Mpris
 
 import qs.modules.ii.sidebarRight.bluetoothDevices
 import qs.modules.ii.sidebarRight.nightLight
@@ -21,7 +21,6 @@ Item {
     id: root
     property int sidebarWidth: Appearance.sizes.sidebarWidth
     property int sidebarPadding: 10
-    property string settingsQmlPath: Quickshell.shellPath("settings.qml")
     property bool showAudioOutputDialog: false
     property bool showAudioInputDialog: false
     property bool showBluetoothDialog: false
@@ -77,23 +76,29 @@ Item {
                 visible: active
                 active: {
                     const configQuickSliders = Config.options.sidebar.quickSliders
-                    if (!configQuickSliders.enable) return false
-                    if (!configQuickSliders.showMic && !configQuickSliders.showVolume && !configQuickSliders.showBrightness) return false;
+                    if (!configQuickSliders.mic && !configQuickSliders.volume && !configQuickSliders.brightness) return false;
                     return true;
                 }
                 sourceComponent: QuickSliders {}
             }
 
-            LoaderedQuickPanelImplementation {
-                styleName: "classic"
-                sourceComponent: ClassicQuickPanel {}
+            QuickPanel {
+                id: quickPanel
+                Layout.fillWidth: true
+                editMode: root.editMode
+                onOpenAudioOutputDialog: root.showAudioOutputDialog = true
+                onOpenAudioInputDialog: root.showAudioInputDialog = true
+                onOpenBluetoothDialog: root.showBluetoothDialog = true
+                onOpenNightLightDialog: root.showNightLightDialog = true
+                onOpenWifiDialog: root.showWifiDialog = true
             }
 
-            LoaderedQuickPanelImplementation {
-                styleName: "android"
-                sourceComponent: AndroidQuickPanel {
-                    editMode: root.editMode
-                }
+            Loader {
+                id: sidebarMediaLoader
+                Layout.fillWidth: true
+                active: Config.options.sidebar.mediaControls
+                visible: active
+                sourceComponent: SidebarMediaPlayer {}
             }
 
             CenterWidgetGroup {
@@ -180,29 +185,26 @@ Item {
         }
     }
 
-    component LoaderedQuickPanelImplementation: Loader {
-        id: quickPanelImplLoader
-        required property string styleName
-        Layout.alignment: item?.Layout.alignment ?? Qt.AlignHCenter
-        Layout.fillWidth: item?.Layout.fillWidth ?? false
-        visible: active
-        active: Config.options.sidebar.quickToggles.style === styleName
-        Connections {
-            target: quickPanelImplLoader.item
-            function onOpenAudioOutputDialog() {
-                root.showAudioOutputDialog = true;
-            }
-            function onOpenAudioInputDialog() {
-                root.showAudioInputDialog = true;
-            }
-            function onOpenBluetoothDialog() {
-                root.showBluetoothDialog = true;
-            }
-            function onOpenNightLightDialog() {
-                root.showNightLightDialog = true;
-            }
-            function onOpenWifiDialog() {
-                root.showWifiDialog = true;
+    component SystemButton: GroupButton {
+        property string buttonIcon
+        baseWidth: 40
+        baseHeight: 40
+        clickedWidth: baseWidth + 20
+        buttonRadius: (altAction && toggled) ? Appearance?.rounding.normal : Math.min(baseHeight, baseWidth) / 2
+        buttonRadiusPressed: Appearance?.rounding?.small
+        colBackground: "transparent"
+        colBackgroundHover: Appearance.colors.colLayer1Hover
+        colBackgroundActive: Appearance.colors.colLayer1Active
+        contentItem: MaterialSymbol {
+            anchors.centerIn: parent
+            iconSize: 22
+            fill: toggled ? 1 : 0
+            color: toggled ? Appearance.m3colors.m3onPrimary : Appearance.colors.colOnLayer1
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: buttonIcon
+            Behavior on color {
+                animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this)
             }
         }
     }
@@ -255,9 +257,8 @@ Item {
             color: Appearance.colors.colLayer1
             padding: 4
 
-            QuickToggleButton {
+            SystemButton {
                 toggled: root.editMode
-                visible: Config.options.sidebar.quickToggles.style === "android"
                 buttonIcon: "edit"
                 onClicked: root.editMode = !root.editMode
                 StyledToolTip {
@@ -266,8 +267,7 @@ Item {
                         : Translation.tr("Edit quick toggles")
                 }
             }
-            QuickToggleButton {
-                toggled: false
+            SystemButton {
                 buttonIcon: "restart_alt"
                 onClicked: {
                     Hyprland.dispatch("reload");
@@ -277,19 +277,17 @@ Item {
                     text: Translation.tr("Reload Hyprland & Quickshell")
                 }
             }
-            QuickToggleButton {
-                toggled: false
+            SystemButton {
                 buttonIcon: "settings"
                 onClicked: {
                     GlobalStates.sidebarRightOpen = false;
-                    Quickshell.execDetached(["qs", "-p", root.settingsQmlPath]);
+                    Quickshell.execDetached(["qs", "-p", Quickshell.shellPath("settings.qml")]);
                 }
                 StyledToolTip {
                     text: Translation.tr("Settings")
                 }
             }
-            QuickToggleButton {
-                toggled: false
+            SystemButton {
                 buttonIcon: "power_settings_new"
                 onClicked: {
                     GlobalStates.sessionOpen = true;

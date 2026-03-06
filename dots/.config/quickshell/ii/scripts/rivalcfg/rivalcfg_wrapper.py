@@ -18,9 +18,11 @@ except ImportError:
 def _mouse():
     m = None
     try:
-        yield None if not RIVALCFG_AVAILABLE else rivalcfg.get_first_mouse()
+        m = None if not RIVALCFG_AVAILABLE else rivalcfg.get_first_mouse()
+        yield m
     finally:
-        if m: m.close() if hasattr(m,'close') else None
+        if m and hasattr(m, 'close'):
+            m.close()
 
 def _clean(n): return re.sub(r'\s*\[[^\]]*\]|\s*\([^)]*\)','',str(n or '')).strip() if isinstance(n,str) else str(n or '')
 
@@ -113,24 +115,37 @@ def cmd_battery(): return _run(lambda m: {
     "error": ""
 }, {"supported":False,"level":100,"is_charging":False,"error":""})
 
-def cmd_set_sensitivity(p): return _run(lambda m: (
-    (hasattr(m,"set_sensitivity") and m.set_sensitivity(p)) or
-    any(getattr(m,f"set_sensitivity{i}",lambda x:None)(dpi) for i,dpi in enumerate(p,1)),
-    m.save(), {"success":True,"error":""}
-)[-1], {"success":False,"error":"Device does not support sensitivity adjustment"})
+def cmd_set_sensitivity(p): return cmd_apply_all({"sensitivity": p})
 
 def cmd_set_polling_rate(r): return _run(lambda m: (
     hasattr(m,"set_polling_rate") and m.set_polling_rate(r) and m.save(),
     {"success":True,"error":""}
 )[-1], {"success":False,"error":"Device does not support polling rate adjustment"})
 
-def cmd_set_buttons(maps):
-    aliases = {"Shift":"LeftShift","Ctrl":"LeftCtrl","Alt":"LeftAlt"}
+def cmd_set_buttons(maps): return cmd_apply_all({"buttons": maps})
+
+def cmd_apply_all(payload):
+    """Apply sensitivity and/or buttons in a single device open/save cycle."""
+    aliases = {"Shift":"LeftShift","Ctrl":"LeftCtrl","Alt":"LeftAlt",
+               "lalt":"LeftAlt","ralt":"RightAlt","lctrl":"LeftCtrl","rctrl":"RightCtrl",
+               "lshift":"LeftShift","rshift":"RightShift",
+               ";":"semicolon","'":"quote",",":"comma",".":"dot","/":"slash","\\":"backslash",
+               "[":"leftbracket","]":"rightbracket","`":"backtick","-":"dash","=":"equal","#":"hash"}
     def inner(m):
-        if any("+" in str(a) for a in maps.values()): raise ValueError("Key combos not supported")
-        if not hasattr(m,"set_buttons_mapping"): raise ValueError("No button mapping support")
-        parts = [f"{b.lower()}={aliases.get(a,a)}" for b,a in maps.items()] + ["layout=qwerty"]
-        m.set_buttons_mapping(f"buttons({'; '.join(parts)})")
+        if "sensitivity" in payload:
+            presets = payload["sensitivity"]
+            if hasattr(m,"set_sensitivity"):
+                m.set_sensitivity(presets)
+            else:
+                for i,dpi in enumerate(presets,1):
+                    fn = getattr(m,f"set_sensitivity{i}",None)
+                    if fn: fn(dpi)
+        if "buttons" in payload:
+            maps = payload["buttons"]
+            if any("+" in str(a) for a in maps.values()): raise ValueError("Key combos not supported")
+            if not hasattr(m,"set_buttons_mapping"): raise ValueError("No button mapping support")
+            parts = [f"{b.lower()}={aliases.get(a,a)}" for b,a in maps.items()] + ["layout=qwerty"]
+            m.set_buttons_mapping(f"buttons({'; '.join(parts)})")
         m.save()
         return {"success":True,"error":""}
     return _run(inner, {"success":False,"error":""})
@@ -186,6 +201,7 @@ def main():
     s = sp.add_parser("sensitivity"); s.add_argument("presets")
     pr = sp.add_parser("polling-rate"); pr.add_argument("rate",type=int)
     b = sp.add_parser("buttons"); b.add_argument("mappings")
+    aa = sp.add_parser("apply-all"); aa.add_argument("payload")
     a = p.parse_args()
     if not a.cmd: p.print_help(); sys.exit(1)
     h = {
@@ -194,6 +210,7 @@ def main():
         "sensitivity": lambda: cmd_set_sensitivity([int(x.strip()) for x in a.presets.split(",") if x.strip().isdigit()]),
         "polling-rate": lambda: cmd_set_polling_rate(a.rate),
         "buttons": lambda: cmd_set_buttons(json.loads(a.mappings)),
+        "apply-all": lambda: cmd_apply_all(json.loads(a.payload)),
         "reset": cmd_reset,
         "settings": cmd_settings
     }

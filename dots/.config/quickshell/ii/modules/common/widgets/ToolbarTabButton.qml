@@ -12,9 +12,21 @@ RippleButton {
     required property bool current
     horizontalPadding: 10
 
+    property bool alwaysExpanded: false
+    readonly property bool expanded: current || hovered || alwaysExpanded
+
+    clip: true
     implicitHeight: 40
-    implicitWidth: implicitContentWidth + horizontalPadding * 2
+    implicitWidth: icon.width + (expanded ? label.implicitWidth + contentRow.spacing : 0) + horizontalPadding * 2
     buttonRadius: height / 2
+
+    Behavior on implicitWidth {
+        NumberAnimation {
+            duration: Appearance.animation.elementMoveFast.duration
+            easing.type: Appearance.animation.elementMoveFast.type
+            easing.bezierCurve: Appearance.animation.elementMoveFast.bezierCurve
+        }
+    }
 
     colBackground: ColorUtils.transparentize(Appearance.colors.colSurfaceContainer)
     colBackgroundHover: ColorUtils.transparentize(Appearance.colors.colOnSurface, current ? 1 : 0.95)
@@ -24,6 +36,7 @@ RippleButton {
         id: contentRow
         anchors.centerIn: parent
         spacing: 6
+        clip: true
 
         MaterialSymbol {
             id: icon
@@ -35,6 +48,25 @@ RippleButton {
             id: label
             anchors.verticalCenter: parent.verticalCenter
             text: root.text
+            opacity: root.expanded ? 1 : 0
+            width: root.expanded ? implicitWidth : 0
+            clip: true
+            animateChange: true
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Appearance.animation.elementMoveFast.duration
+                    easing.type: Appearance.animation.elementMoveFast.type
+                    easing.bezierCurve: Appearance.animation.elementMoveFast.bezierCurve
+                }
+            }
+            Behavior on width {
+                NumberAnimation {
+                    duration: Appearance.animation.elementMoveFast.duration
+                    easing.type: Appearance.animation.elementMoveFast.type
+                    easing.bezierCurve: Appearance.animation.elementMoveFast.bezierCurve
+                }
+            }
         }
     }
 }

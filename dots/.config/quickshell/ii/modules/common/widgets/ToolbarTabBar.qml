@@ -10,6 +10,7 @@ Item {
     id: root
     property alias currentIndex: tabBar.currentIndex
     required property var tabButtonList
+    property bool alwaysExpanded: false
 
     function incrementCurrentIndex() {
         tabBar.incrementCurrentIndex();
@@ -29,6 +30,7 @@ Item {
         required property int index
         required property var modelData
         current: index == root.currentIndex
+        alwaysExpanded: root.alwaysExpanded
         text: modelData.name
         materialSymbol: modelData.icon
         onClicked: {
@@ -43,6 +45,7 @@ Item {
         spacing: 4
 
         Repeater {
+            id: tabRepeater
             model: root.tabButtonList
             delegate: root.delegate
         }
@@ -52,25 +55,11 @@ Item {
         id: activeIndicator
         z: 0
         color: Appearance.colors.colSecondaryContainer
-        implicitWidth: contentItem.children[root.currentIndex]?.implicitWidth ?? 0
-        implicitHeight: contentItem.children[root.currentIndex]?.implicitHeight ?? 0
         radius: height / 2
-        // Animation
-        property Item targetItem: (root.currentIndex >= 0 && contentItem.children.length > root.currentIndex) ? contentItem.children[root.currentIndex] : null
-        AnimatedTabIndexPair {
-            id: leftBound
-            idx1Duration: 50
-            idx2Duration: 200
-            index: (activeIndicator.targetItem ? activeIndicator.targetItem.x : 0)
-        }
-        AnimatedTabIndexPair {
-            id: rightBound
-            idx1Duration: 50
-            idx2Duration: 200
-            index: (activeIndicator.targetItem ? (activeIndicator.targetItem.x + activeIndicator.targetItem.width) : 0)
-        }
-        x: Math.min(leftBound.idx1, leftBound.idx2)
-        width: Math.max(rightBound.idx1, rightBound.idx2) - x
+        property Item targetItem: (root.currentIndex >= 0 && tabRepeater.count > root.currentIndex) ? tabRepeater.itemAt(root.currentIndex) : null
+        x: targetItem?.x ?? 0
+        width: targetItem?.width ?? 0
+        height: targetItem?.height ?? root.implicitHeight
     }
 
     MouseArea {

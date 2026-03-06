@@ -17,6 +17,27 @@ import qs.modules.common
 Singleton {
 	id: root;
 	property list<MprisPlayer> players: Mpris.players.values.filter(player => isRealPlayer(player));
+	readonly property var meaningfulPlayers: {
+		let filtered = [];
+		let used = new Set();
+		for (let i = 0; i < players.length; ++i) {
+			if (used.has(i)) continue;
+			let p1 = players[i];
+			let group = [i];
+			for (let j = i + 1; j < players.length; ++j) {
+				let p2 = players[j];
+				if (p1.trackTitle && p2.trackTitle &&
+					(p1.trackTitle.includes(p2.trackTitle) || p2.trackTitle.includes(p1.trackTitle)))
+					group.push(j);
+			}
+			let chosenIdx = group.find(idx => players[idx].trackArtUrl?.length > 0) ?? group[0];
+			filtered.push(players[chosenIdx]);
+			group.forEach(idx => used.add(idx));
+		}
+		if (filtered.length > 0) return filtered;
+		if (activePlayer) return [activePlayer];
+		return [];
+	}
 	property MprisPlayer trackedPlayer: null;
 	property MprisPlayer activePlayer: trackedPlayer ?? Mpris.players.values[0] ?? null;
 	signal trackChanged(reverse: bool);

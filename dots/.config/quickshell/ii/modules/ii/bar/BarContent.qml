@@ -27,7 +27,7 @@ Item { // Bar content region
 
     // Background shadow
     Loader {
-        active: Config.options.bar.showBackground && Config.options.bar.cornerStyle === 1 && Config.options.bar.floatStyleShadow
+        active: Config.options.bar.background && Config.options.bar.cornerStyle === 1 && Config.options.bar.floatStyleShadow
         anchors.fill: barBackground
         sourceComponent: StyledRectangularShadow {
             anchors.fill: undefined // The loader's anchors act on this, and this should not have any anchor
@@ -41,7 +41,7 @@ Item { // Bar content region
             fill: parent
             margins: Config.options.bar.cornerStyle === 1 ? (Appearance.sizes.hyprlandGapsOut) : 0 // idk why but +1 is needed
         }
-        color: Config.options.bar.showBackground ? Appearance.colors.colLayer0 : "transparent"
+        color: Config.options.bar.background ? Appearance.colors.colLayer0 : "transparent"
         radius: Config.options.bar.cornerStyle === 1 ? Appearance.rounding.windowRounding : 0
         border.width: Config.options.bar.cornerStyle === 1 ? 1 : 0
         border.color: Appearance.colors.colLayer0Border

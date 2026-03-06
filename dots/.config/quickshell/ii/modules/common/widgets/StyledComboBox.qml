@@ -19,6 +19,23 @@ ComboBox {
     implicitHeight: 40
     Layout.fillWidth: true
 
+    Keys.onPressed: function(event) {
+        if (!popup.visible || event.text.length !== 1) return
+        var letter = event.text.toLowerCase()
+        var start = (currentIndex + 1) % count
+        for (var i = 0; i < count; i++) {
+            var idx = (start + i) % count
+            var item = model[idx]
+            var text = typeof item === 'object' ? (item[root.textRole] || "") : String(item)
+            if (text.toLowerCase().startsWith(letter)) {
+                currentIndex = idx
+                listView.positionViewAtIndex(idx, ListView.Contain)
+                event.accepted = true
+                return
+            }
+        }
+    }
+
     background: Rectangle {
         radius: root.buttonRadius
         color: (root.down && !root.popup.visible) ? root.colBackgroundActive : root.hovered ? root.colBackgroundHover : root.colBackground
@@ -201,6 +218,7 @@ ComboBox {
             clip: true
             implicitHeight: contentHeight
             spacing: 2
+            smoothScroll: false
             model: root.popup.visible ? root.delegateModel : null
             currentIndex: root.highlightedIndex
         }

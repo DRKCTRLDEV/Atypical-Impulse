@@ -21,8 +21,8 @@ Item {
         anchors.centerIn: parent
 
         Loader {
-            active: Config.options.bar.utilButtons.showScreenSnip
-            visible: Config.options.bar.utilButtons.showScreenSnip
+            active: Config.options.bar.utilButtons.screenSnip
+            visible: Config.options.bar.utilButtons.screenSnip
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
                 onClicked: Quickshell.execDetached(["qs", "-p", Quickshell.shellPath(""), "ipc", "call", "region", "screenshot"]);
@@ -37,8 +37,8 @@ Item {
         }
 
         Loader {
-            active: Config.options.bar.utilButtons.showScreenRecord
-            visible: Config.options.bar.utilButtons.showScreenRecord
+            active: Config.options.bar.utilButtons.screenRecord
+            visible: Config.options.bar.utilButtons.screenRecord
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
                 onClicked: Quickshell.execDetached([Directories.recordScriptPath])
@@ -53,8 +53,8 @@ Item {
         }
 
         Loader {
-            active: Config.options.bar.utilButtons.showColorPicker
-            visible: Config.options.bar.utilButtons.showColorPicker
+            active: Config.options.bar.utilButtons.colorPicker
+            visible: Config.options.bar.utilButtons.colorPicker
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
                 onClicked: Quickshell.execDetached(["hyprpicker", "-a"])
@@ -69,8 +69,8 @@ Item {
         }
 
         Loader {
-            active: Config.options.bar.utilButtons.showKeyboardToggle
-            visible: Config.options.bar.utilButtons.showKeyboardToggle
+            active: Config.options.bar.utilButtons.keyboardToggle
+            visible: Config.options.bar.utilButtons.keyboardToggle
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
                 onClicked: GlobalStates.oskOpen = !GlobalStates.oskOpen
@@ -85,8 +85,8 @@ Item {
         }
 
         Loader {
-            active: Config.options.bar.utilButtons.showMicToggle
-            visible: Config.options.bar.utilButtons.showMicToggle
+            active: Config.options.bar.utilButtons.micToggle
+            visible: Config.options.bar.utilButtons.micToggle
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
                 onClicked: Quickshell.execDetached(["wpctl", "set-mute", "@DEFAULT_SOURCE@", "toggle"])
@@ -101,8 +101,8 @@ Item {
         }
 
         Loader {
-            active: Config.options.bar.utilButtons.showDarkModeToggle
-            visible: Config.options.bar.utilButtons.showDarkModeToggle
+            active: Config.options.bar.utilButtons.darkModeToggle
+            visible: Config.options.bar.utilButtons.darkModeToggle
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
                 onClicked: event => {
@@ -123,8 +123,8 @@ Item {
         }
 
         Loader {
-            active: Config.options.bar.utilButtons.showPerformanceProfileToggle
-            visible: Config.options.bar.utilButtons.showPerformanceProfileToggle
+            active: Config.options.bar.utilButtons.performanceProfileToggle
+            visible: Config.options.bar.utilButtons.performanceProfileToggle
             sourceComponent: CircleUtilButton {
                 Layout.alignment: Qt.AlignVCenter
                 onClicked: event => {

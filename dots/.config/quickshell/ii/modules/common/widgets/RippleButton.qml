@@ -4,9 +4,11 @@ import qs.modules.common.functions
 import Qt5Compat.GraphicalEffects
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 /**
  * A button with ripple effect similar to in Material Design.
+ * Optionally shows an icon + text layout when materialIcon or nerdIcon is set.
  */
 Button {
     id: root
@@ -23,19 +25,29 @@ Button {
     property var altAction // When right clicking
     property var middleClickAction // When middle clicking
 
-    property color colBackground: ColorUtils.transparentize(Appearance?.colors.colLayer1Hover, 1) || "transparent"
-    property color colBackgroundHover: Appearance?.colors.colLayer1Hover ?? "#E5DFED"
+    // Icon properties (for icon+text buttons)
+    property string nerdIcon
+    property string materialIcon
+    property bool materialIconFill: true
+    property color iconColor: Appearance?.colors.colOnSecondaryContainer ?? "#333"
+    property string mainText: ""
+    property Component mainContentComponent
+
+    property color colBackground: Appearance?.colors.colSecondaryContainer ?? "#E8DEF8"
+    property color colBackgroundHover: Appearance?.colors.colSecondaryContainerHover ?? "#E5DFED"
     property color colBackgroundToggled: Appearance?.colors.colPrimary ?? "#65558F"
     property color colBackgroundToggledHover: Appearance?.colors.colPrimaryHover ?? "#77699C"
-    property color colRipple: Appearance?.colors.colLayer1Active ?? "#D6CEE2"
+    property color colRipple: Appearance?.colors.colSecondaryContainerActive ?? "#D6CEE2"
     property color colRippleToggled: Appearance?.colors.colPrimaryActive ?? "#D6CEE2"
 
+    horizontalPadding: (root.materialIcon || root.nerdIcon) ? 10 : 0
     opacity: root.enabled ? 1 : 0.4
-    property color buttonColor: ColorUtils.transparentize(root.toggled ? 
+    property color buttonColor: !root.enabled ? colBackground :
+        root.toggled ? 
         (root.hovered ? colBackgroundToggledHover : 
             colBackgroundToggled) :
         (root.hovered ? colBackgroundHover : 
-            colBackground), root.enabled ? 0 : 1)
+            colBackground)
     property color rippleColor: root.toggled ? colRippleToggled : colRipple
 
     function startRipple(x, y) {
@@ -59,6 +71,7 @@ Button {
 
     MouseArea {
         anchors.fill: parent
+        enabled: root.enabled
         cursorShape: root.pointingHandCursor ? Qt.PointingHandCursor : Qt.ArrowCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         onPressed: (event) => { 
@@ -134,7 +147,7 @@ Button {
     background: Rectangle {
         id: buttonBackground
         radius: root.buttonEffectiveRadius
-        implicitHeight: 30
+        implicitHeight: (root.materialIcon || root.nerdIcon) ? 35 : 30
 
         color: root.buttonColor
         Behavior on color {
@@ -180,7 +193,48 @@ Button {
         }
     }
 
-    contentItem: StyledText {
-        text: root.buttonText
+    contentItem: RowLayout {
+        visible: !!(root.materialIcon || root.nerdIcon)
+        Item {
+            Layout.fillWidth: false
+            implicitWidth: Math.max(defaultMatIcon.implicitWidth, defaultNrdIcon.implicitWidth)
+            Loader {
+                id: defaultMatIcon
+                anchors.centerIn: parent
+                active: !!root.materialIcon && !root.nerdIcon
+                sourceComponent: MaterialSymbol {
+                    text: root.materialIcon
+                    iconSize: Appearance.font.pixelSize.larger
+                    color: root.iconColor
+                    fill: root.materialIconFill ? 1 : 0
+                }
+            }
+            Loader {
+                id: defaultNrdIcon
+                anchors.centerIn: parent
+                active: !!root.nerdIcon
+                sourceComponent: StyledText {
+                    text: root.nerdIcon
+                    font.pixelSize: Appearance.font.pixelSize.larger
+                    font.family: Appearance.font.family.iconNerd
+                    color: root.iconColor
+                }
+            }
+        }
+        Loader {
+            Layout.fillWidth: true
+            active: !!(root.mainContentComponent || root.mainText)
+            sourceComponent: root.mainContentComponent ?? defaultMainContentComp
+        }
+    }
+
+    Component {
+        id: defaultMainContentComp
+        StyledText {
+            visible: text !== ""
+            text: root.mainText
+            font.pixelSize: Appearance.font.pixelSize.small
+            color: Appearance.colors.colOnSecondaryContainer
+        }
     }
 }

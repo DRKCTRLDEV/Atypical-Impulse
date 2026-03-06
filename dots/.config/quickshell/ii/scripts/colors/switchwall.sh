@@ -15,7 +15,7 @@ terminalscheme="$SCRIPT_DIR/terminal/scheme-base.json"
 handle_kde_material_you_colors() {
     # Check if Qt app theming is enabled in config
     if [ -f "$SHELL_CONFIG_FILE" ]; then
-        enable_qt_apps=$(jq -r '.appearance.wallpaperTheming.enableQtApps' "$SHELL_CONFIG_FILE")
+        enable_qt_apps=$(jq -r '.appearance.wallpaperTheming.qtApps' "$SHELL_CONFIG_FILE")
         if [ "$enable_qt_apps" == "false" ]; then
             return
         fi
@@ -282,7 +282,7 @@ switch() {
 
     # Check if app and shell theming is enabled in config
     if [ -f "$SHELL_CONFIG_FILE" ]; then
-        enable_apps_shell=$(jq -r '.appearance.wallpaperTheming.enableAppsAndShell' "$SHELL_CONFIG_FILE")
+        enable_apps_shell=$(jq -r '.appearance.wallpaperTheming.appsAndShell' "$SHELL_CONFIG_FILE")
         if [ "$enable_apps_shell" == "false" ]; then
             echo "App and shell theming disabled, skipping matugen and color generation"
             return

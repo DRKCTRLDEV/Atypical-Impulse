@@ -13,7 +13,7 @@ import qs.modules.common.functions
 
 Scope {
     id: bar
-    property bool showBarBackground: Config.options.bar.showBackground
+    property bool barBackground: Config.options.bar.background
 
     Variants {
         // For each monitor
@@ -145,7 +145,7 @@ Scope {
                             right: undefined
                         }
                         width: Appearance.rounding.screenRounding
-                        active: showBarBackground && Config.options.bar.cornerStyle === 0 // Hug
+                        active: barBackground && Config.options.bar.cornerStyle === 0 // Hug
 
                         states: State {
                             name: "right"
@@ -172,7 +172,7 @@ Scope {
                                 }
 
                                 implicitSize: Appearance.rounding.screenRounding
-                                color: showBarBackground ? Appearance.colors.colLayer0 : "transparent"
+                                color: barBackground ? Appearance.colors.colLayer0 : "transparent"
 
                                 corner: RoundCorner.CornerEnum.TopLeft
                                 states: State {
@@ -191,7 +191,7 @@ Scope {
                                     right: Config.options.bar.bottom ? parent.right : undefined
                                 }
                                 implicitSize: Appearance.rounding.screenRounding
-                                color: showBarBackground ? Appearance.colors.colLayer0 : "transparent"
+                                color: barBackground ? Appearance.colors.colLayer0 : "transparent"
 
                                 corner: RoundCorner.CornerEnum.BottomLeft
                                 states: State {

@@ -63,7 +63,7 @@ Scope {
     }
 
     function toggleWallpaperSelector() {
-        if (Config.options.wallpaperSelector.useSystemFileDialog) {
+        if (Config.options.wallpaperSelector.systemFileDialog) {
             Wallpapers.openFallbackPicker(Appearance.m3colors.darkmode);
             return;
         }

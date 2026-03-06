@@ -182,10 +182,14 @@ MouseArea {
                             onClicked: Wallpapers.setDirectory(quickDirButton.modelData.path)
                             enabled: modelData.icon.length > 0
                             toggled: Wallpapers.directory === Qt.resolvedUrl(modelData.path)
+                            colBackground: "transparent"
+                            colBackgroundHover: Appearance.colors.colLayer1Hover
+                            colRipple: Appearance.colors.colLayer1Active
                             colBackgroundToggled: Appearance.colors.colSecondaryContainer
                             colBackgroundToggledHover: Appearance.colors.colSecondaryContainerHover
                             colRippleToggled: Appearance.colors.colSecondaryContainerActive
                             buttonRadius: height / 2
+                            horizontalPadding: 10
                             implicitHeight: 38
 
                             contentItem: RowLayout {
@@ -326,7 +330,7 @@ MouseArea {
                             altAction: () => {
                                 Wallpapers.openFallbackPicker(root.useDarkMode);
                                 GlobalStates.wallpaperSelectorOpen = false;
-                                Config.options.wallpaperSelector.useSystemFileDialog = true
+                                Config.options.wallpaperSelector.systemFileDialog = true
                             }
                             text: "open_in_new"
                             StyledToolTip {

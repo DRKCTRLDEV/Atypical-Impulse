@@ -13,17 +13,17 @@ ContentPage {
         ConfigSwitch {
             buttonIcon: "hardware"
             text: Translation.tr("Shell & utilities")
-            checked: Config.options.appearance.wallpaperTheming.enableAppsAndShell
+            checked: Config.options.appearance.wallpaperTheming.appsAndShell
             onCheckedChanged: {
-                Config.options.appearance.wallpaperTheming.enableAppsAndShell = checked;
+                Config.options.appearance.wallpaperTheming.appsAndShell = checked;
             }
         }
         ConfigSwitch {
             buttonIcon: "tv_options_input_settings"
             text: Translation.tr("Qt apps")
-            checked: Config.options.appearance.wallpaperTheming.enableQtApps
+            checked: Config.options.appearance.wallpaperTheming.qtApps
             onCheckedChanged: {
-                Config.options.appearance.wallpaperTheming.enableQtApps = checked;
+                Config.options.appearance.wallpaperTheming.qtApps = checked;
             }
             StyledToolTip {
                 text: Translation.tr("Shell & utilities theming must also be enabled")
@@ -32,9 +32,9 @@ ContentPage {
         ConfigSwitch {
             buttonIcon: "terminal"
             text: Translation.tr("Terminal")
-            checked: Config.options.appearance.wallpaperTheming.enableTerminal
+            checked: Config.options.appearance.wallpaperTheming.terminal
             onCheckedChanged: {
-                Config.options.appearance.wallpaperTheming.enableTerminal = checked;
+                Config.options.appearance.wallpaperTheming.terminal = checked;
             }
             StyledToolTip {
                 text: Translation.tr("Shell & utilities theming must also be enabled")
@@ -56,7 +56,7 @@ ContentPage {
         }
 
         ConfigSpinBox {
-            icon: "invert_colors"
+            buttonIcon: "invert_colors"
             text: Translation.tr("Terminal: Harmony (%)")
             value: Config.options.appearance.wallpaperTheming.terminalGenerationProps.harmony * 100
             from: 0
@@ -67,7 +67,7 @@ ContentPage {
             }
         }
         ConfigSpinBox {
-            icon: "gradient"
+            buttonIcon: "gradient"
             text: Translation.tr("Terminal: Harmonize threshold")
             value: Config.options.appearance.wallpaperTheming.terminalGenerationProps.harmonizeThreshold
             from: 0
@@ -78,7 +78,7 @@ ContentPage {
             }
         }
         ConfigSpinBox {
-            icon: "format_color_text"
+            buttonIcon: "format_color_text"
             text: Translation.tr("Terminal: Foreground boost (%)")
             value: Config.options.appearance.wallpaperTheming.terminalGenerationProps.termFgBoost * 100
             from: 0

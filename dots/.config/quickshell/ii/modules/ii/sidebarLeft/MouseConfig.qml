@@ -2,9 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import qs.modules.common
-import qs.modules.common.functions
 import qs.modules.common.widgets
 import qs.modules.ii.sidebarLeft.mouseConfig
 import qs.services
@@ -13,6 +11,8 @@ Item {
     id: root
 
     property string listeningButton: ""
+    property string capturedButton: ""
+    property string capturedAction: ""
 
     onFocusChanged: {
         if (focus) {
@@ -26,7 +26,8 @@ Item {
         if (!root.listeningButton) return
         var k = KeyLib.keyToRivalcfg(event.key)
         if (k) {
-            RivalCfg.setButtonBinding(root.listeningButton, k)
+            root.capturedButton = root.listeningButton
+            root.capturedAction = k
             root.listeningButton = ""
         }
         event.accepted = true
@@ -63,7 +64,6 @@ Item {
                 Layout.preferredWidth: 120
                 implicitHeight: 36
                 buttonRadius: Appearance.rounding.full
-                colBackground: Appearance.colors.colSecondaryContainer
                 onClicked: RivalCfg.refresh()
                 contentItem: RowLayout {
                     spacing: 8
@@ -101,8 +101,19 @@ Item {
             DeviceCard {}
             ControlCard {
                 listeningButton: root.listeningButton
-                onStartListening: function(b) { root.listeningButton = b; root.forceActiveFocus() }
+                capturedButton: root.capturedButton
+                capturedAction: root.capturedAction
+                onStartListening: function(b) {
+                    root.capturedButton = ""
+                    root.capturedAction = ""
+                    root.listeningButton = b
+                    root.forceActiveFocus()
+                }
                 onStopListening: root.listeningButton = ""
+                onCaptureProcessed: {
+                    root.capturedButton = ""
+                    root.capturedAction = ""
+                }
             }
         }
     }

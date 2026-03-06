@@ -10,6 +10,7 @@ settings_paths=(
   "${XDG_CONFIG_HOME:-$HOME/.config}/Code - OSS/User/settings.json"
   "${XDG_CONFIG_HOME:-$HOME/.config}/Code - Insiders/User/settings.json"
   "${XDG_CONFIG_HOME:-$HOME/.config}/Cursor/User/settings.json"
+  "${XDG_CONFIG_HOME:-$HOME/.config}/Antigravity/User/settings.json"
 )
 
 command -v jq >/dev/null || exit 1

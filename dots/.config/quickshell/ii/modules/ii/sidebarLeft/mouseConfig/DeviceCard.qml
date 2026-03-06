@@ -10,14 +10,25 @@ Rectangle {
     radius: Appearance.rounding.small
     color: Appearance.colors.colLayer2
     Layout.fillWidth: true
+
+    // Shared battery color computation (avoids repeating the same ternary chain)
+    readonly property color batteryBgColor: RivalCfg.isCharging ? Appearance.colors.colPrimaryContainer
+        : RivalCfg.batteryLevel <= 20 ? Appearance.colors.colErrorContainer
+        : RivalCfg.batteryLevel <= 40 ? Appearance.colors.colTertiaryContainer
+        : Appearance.colors.colLayer3
+    readonly property color batteryFgColor: RivalCfg.isCharging ? Appearance.colors.colOnPrimaryContainer
+        : RivalCfg.batteryLevel <= 20 ? Appearance.colors.colOnErrorContainer
+        : RivalCfg.batteryLevel <= 40 ? Appearance.colors.colOnTertiaryContainer
+        : Appearance.colors.colOnLayer3
+    readonly property int clampedBattery: Math.max(0, Math.min(100, RivalCfg.batteryLevel || 0))
     
     // Battery progress bar
     Rectangle {
         id: fill
         anchors { top: parent.top; bottom: parent.bottom; left: parent.left }
-        width: RivalCfg.hasBattery ? Math.max(0, Math.min(100, RivalCfg.batteryLevel || 0)) / 100 * parent.width : 0
+        width: RivalCfg.hasBattery ? root.clampedBattery / 100 * parent.width : 0
         radius: Appearance.rounding.small
-        color: RivalCfg.isCharging ? Appearance.colors.colPrimaryContainer : (RivalCfg.batteryLevel <= 20 ? Appearance.colors.colErrorContainer : (RivalCfg.batteryLevel <= 40 ? Appearance.colors.colTertiaryContainer : Appearance.colors.colLayer3))
+        color: root.batteryBgColor
         visible: RivalCfg.hasBattery
     }
 
@@ -57,13 +68,10 @@ Rectangle {
         }
 
         StyledText {
-            text: (RivalCfg.batteryLevel || 0) + "%"
+            text: root.clampedBattery + "%"
             font { pixelSize: Appearance.font.pixelSize.hugeass; weight: Font.Bold }
             color: (RivalCfg.batteryLevel > 85 && fill.width >= batRow.x + batRow.implicitWidth - 4) ?
-                   (RivalCfg.isCharging ? Appearance.colors.colOnPrimaryContainer :
-                   (RivalCfg.batteryLevel <= 20 ? Appearance.colors.colOnErrorContainer :
-                   (RivalCfg.batteryLevel <= 40 ? Appearance.colors.colOnTertiaryContainer : Appearance.colors.colOnLayer3))) :
-                   Appearance.colors.colOnLayer2
+                   root.batteryFgColor : Appearance.colors.colOnLayer2
         }
         MaterialSymbol {
             visible: RivalCfg.isCharging
