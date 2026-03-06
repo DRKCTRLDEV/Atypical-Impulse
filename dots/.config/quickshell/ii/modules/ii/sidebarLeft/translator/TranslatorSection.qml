@@ -50,6 +50,7 @@ Rectangle {
                 id: languageCombo
                 implicitHeight: 36
                 buttonRadius: Appearance.rounding.small
+                selectOnLetterJump: true
                 model: root.languages
                 currentIndex: Math.max(0, model.indexOf(root.currentLanguage))
                 onActivated: index => {

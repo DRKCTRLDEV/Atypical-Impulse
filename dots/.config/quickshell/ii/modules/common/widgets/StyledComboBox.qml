@@ -15,6 +15,7 @@ ComboBox {
     property color colBackground: Appearance.colors.colSecondaryContainer
     property color colBackgroundHover: Appearance.colors.colSecondaryContainerHover
     property color colBackgroundActive: Appearance.colors.colSecondaryContainerActive
+    property bool selectOnLetterJump: false
 
     implicitHeight: 40
     Layout.fillWidth: true
@@ -30,6 +31,9 @@ ComboBox {
             if (text.toLowerCase().startsWith(letter)) {
                 currentIndex = idx
                 listView.positionViewAtIndex(idx, ListView.Contain)
+                if (root.selectOnLetterJump) {
+                    root.activated(idx)
+                }
                 event.accepted = true
                 return
             }
