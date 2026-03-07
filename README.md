@@ -1,39 +1,42 @@
-# Dots Hyprland
+# Atypical Impulse (Dots Hyprland)
 
-A minimalistic Hyprland configuration (fork of [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland)) with a focus on simplicity, performance, and clean aesthetics.
+A minimalist Hyprland configuration forked from [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland), focused on simplicity, performance, and clean aesthetics.
 
-## This Fork
+## About This Fork
 
-Streamlined fork focusing on a lightweight, fast, and distraction-free desktop experience while retaining the core functionality of the original project.
+This fork provides a lightweight, fast, and distraction-free desktop experience while preserving the core strengths of the original project.
 
 ### Key Differences
 
-- **Minimalist**: Removed anime assets and AI components
-- **Gaming Peripherals**: RivalCFG support for SteelSeries Rival devices
-- **Refined UI/UX**: Unified QuickToggles, improved Bottom Widget Group, SidebarRight Media Player
-- **ScreenRuler**: Measurement tool using RegionSelector components
-- **Bar Modularization**: Toggleable/customizable widgets (coming soon)
+- **Minimalist direction**: Anime assets and AI-related components removed
+- **Gaming peripheral support**: `RivalCFG` integration for SteelSeries Rival devices
+- **Refined UI/UX**:
+    - Unified QuickToggles
+    - Improved Bottom Widget Group
+    - SidebarRight Media Player
+- **ScreenRuler**: Measurement tool built with RegionSelector components
+- **Bar modularization**: Toggleable/customizable widgets *(planned)*
 
 ## Features
 
-- **RivalCFG/MouseConfig**: SteelSeries Rival gaming peripherals support
-- **SidebarRight Media Player**: Dedicated widget in RightSidebar
-- **Unified QuickToggles**: Modern, consistent design
-- **Translator**: Clean, intuitive interface
-- **ToggleSplit**: Keybind ``` SUPER + ` ```
+- **RivalCFG / MouseConfig** for SteelSeries Rival peripherals
+- **SidebarRight Media Player** in the right sidebar
+- **Unified QuickToggles** with a consistent modern design
+- **Translator** with a clean and intuitive interface
+- **ToggleSplit** keybind: ``SUPER + ` ``
 
-## Future Plans
+## Roadmap
 
-- Bar widget modularization (via config.qml, then Settings app)
+- Bar widget modularization (via `config.qml`, then Settings app)
 - Dependency reduction (`systemsettings`, `kde-material-you-colors`)
 - Custom colorscheme support
-- Redesigned Settings Application
+- Redesigned Settings application
 
 ## Installation
 
 ```bash
-git clone https://github.com/drkctrldev/dots-hyprland.git
-cd dots-hyprland
+git clone https://github.com/drkctrldev/atypical-impulse.git
+cd atypical-impulse
 ./setup install
 ```
 
@@ -41,11 +44,12 @@ Follow the on-screen prompts to complete installation.
 
 ## dots-extra
 
-Optional tweaks in the `dots-extra` directory. See individual READMEs for setup help.
+Optional tweaks are available in the `dots-extra` directory.  
+See each subdirectory README for setup instructions.
 
 ## License
 
-See `LICENSE` file and `licenses/` directory.
+See the `LICENSE` file and the `licenses/` directory for details.
 
 ## Acknowledgements
 
