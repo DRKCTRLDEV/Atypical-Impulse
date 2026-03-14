@@ -15,7 +15,6 @@ StyledOverlayWidget {
     id: root
     minimumWidth: 340
     minimumHeight: 200
-    showCenterButton: true
     property list<var> resources: [
         {
             "icon": "planner_review",

@@ -12,7 +12,6 @@ StyledOverlayWidget {
     id: root
     minimumWidth: 340
     minimumHeight: 130
-    showCenterButton: true
 
     contentItem: OverlayBackground {
         id: contentItem

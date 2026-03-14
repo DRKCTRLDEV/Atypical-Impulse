@@ -9,7 +9,6 @@ StyledOverlayWidget {
     id: root
     minimumWidth: 340
     title: Translation.tr("Notes")
-    showCenterButton: true
 
     contentItem: NotesContent {
         radius: root.contentRadius
