@@ -45,3 +45,7 @@ output_path = '~/.config/vesktop/themes/midnight.theme.css'
 [templates.micro]
 input_path = '~/.config/matugen/templates/micro/colorscheme.micro'
 output_path = '~/.config/micro/colorschemes/matugen.micro'
+
+[templates.zed]
+input_path = '~/.config/matugen/templates/zed/zed-colors.json'
+output_path = '~/.config/zed/themes/matugen.json'
