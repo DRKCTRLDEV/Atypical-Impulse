@@ -51,9 +51,10 @@ Item {
 
     Process {
         id: translateProc
-        command: ["bash", "-c",
-            `trans -brief -from '${StringUtils.shellSingleQuoteEscape(root.sourceLanguage)}' -to '${StringUtils.shellSingleQuoteEscape(root.targetLanguage)}' '${StringUtils.shellSingleQuoteEscape(root.inputTextArea ? root.inputTextArea.text.trim() : "")}'`
-        ]
+        command: ["bash", "-c", `trans -brief -no-bidi`
+            + ` -source '${StringUtils.shellSingleQuoteEscape(root.sourceLanguage)}'`
+            + ` -target '${StringUtils.shellSingleQuoteEscape(root.targetLanguage)}'`
+            + ` '${StringUtils.shellSingleQuoteEscape(root.inputField.text.trim())}'`]
         property string buffer: ""
         stdout: SplitParser {
             onRead: data => {
