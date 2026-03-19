@@ -11,7 +11,7 @@ if status is-interactive # Commands to run in interactive sessions can go here
     # No greeting
     set fish_greeting
 
-    if test -z "$VSCODE_PID" -a "$TERM_PROGRAM" != "vscode"
+    if test -z "$VSCODE_PID" -a "$TERM_PROGRAM" != "vscode" -a -z "$ZED_TERM"
         set _tty (tty)
         if test "$TERM" != "linux" -a (not string match -r '^/dev/tty[0-9]+$' $_tty)
             starship init fish | source
@@ -27,5 +27,5 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias clear "printf '\033[2J\033[3J\033[1;1H'"
     alias cls 'clear'
     alias q 'qs -c ii'
-    
+
 end
