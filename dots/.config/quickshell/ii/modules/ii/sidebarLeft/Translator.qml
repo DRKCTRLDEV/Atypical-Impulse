@@ -54,7 +54,7 @@ Item {
         command: ["bash", "-c", `trans -brief -no-bidi`
             + ` -source '${StringUtils.shellSingleQuoteEscape(root.sourceLanguage)}'`
             + ` -target '${StringUtils.shellSingleQuoteEscape(root.targetLanguage)}'`
-            + ` '${StringUtils.shellSingleQuoteEscape(root.inputField.text.trim())}'`]
+            + ` '${StringUtils.shellSingleQuoteEscape(root.inputTextArea.text.trim())}'`]
         property string buffer: ""
         stdout: SplitParser {
             onRead: data => {
