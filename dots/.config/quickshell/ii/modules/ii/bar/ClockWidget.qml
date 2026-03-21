@@ -7,7 +7,7 @@ import QtQuick.Layouts
 Item {
     id: root
     property bool borderless: Config.options.bar.borderless
-    property bool showDate: Config.options.bar.verbose
+    property bool date: Config.options.bar.verbose
     implicitWidth: rowLayout.implicitWidth
     implicitHeight: Appearance.sizes.barHeight
 
@@ -23,14 +23,14 @@ Item {
         }
 
         StyledText {
-            visible: root.showDate
+            visible: root.date
             font.pixelSize: Appearance.font.pixelSize.small
             color: Appearance.colors.colOnLayer1
             text: "•"
         }
 
         StyledText {
-            visible: root.showDate
+            visible: root.date
             font.pixelSize: Appearance.font.pixelSize.small
             color: Appearance.colors.colOnLayer1
             text: DateTime.longDate

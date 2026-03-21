@@ -11,14 +11,14 @@ RippleButton {
     property alias stepSize: spinBoxWidget.stepSize
     property alias from: spinBoxWidget.from
     property alias to: spinBoxWidget.to
-    
+
     Layout.fillWidth: true
     implicitHeight: contentItem.implicitHeight + 8 * 2
     font.pixelSize: Appearance.font.pixelSize.small
     colBackground: "transparent"
     colBackgroundHover: Appearance.colors.colLayer1Hover
     colRipple: Appearance.colors.colLayer1Active
-    
+
     onClicked: checked = !checked
 
     contentItem: RowLayout {
@@ -28,6 +28,7 @@ RippleButton {
             icon: root.buttonIcon
             opacity: root.enabled ? 1 : 0.4
             iconSize: Appearance.font.pixelSize.larger
+            Layout.leftMargin: 8
         }
         StyledText {
             id: labelWidget
@@ -39,9 +40,10 @@ RippleButton {
         }
         StyledSpinBox {
             id: spinBoxWidget
-            baseHeight: 32 * 0.80 // match the height of ConfigSwitch for visual consistency
+            baseHeight: 32 * 0.85 // match the height of ConfigSwitch for visual consistency
             topPadding: 0
             bottomPadding: 0
+            Layout.rightMargin: 8
             value: root.value
         }
     }

@@ -19,11 +19,13 @@ SpinBox {
     background: Rectangle {
         color: Appearance.colors.colLayer2
         radius: root.radius
+        border.width: 2
+        border.color: Appearance.m3colors.m3outline
     }
 
     contentItem: Item {
         implicitHeight: root.baseHeight
-        implicitWidth: Math.max(labelText.implicitWidth, 40)
+        implicitWidth: Math.max(labelText.implicitWidth, 30)
 
         StyledTextInput {
             id: labelText

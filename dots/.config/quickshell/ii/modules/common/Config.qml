@@ -247,6 +247,8 @@ Singleton {
                 property real hoverRegionHeight: 2
                 property bool pinnedOnStartup: false
                 property bool hoverToReveal: true // When false, only reveals on empty workspace
+                property bool pinButton: true
+                property bool launcherButton: true
                 property list<string> pinnedApps: [ // IDs of pinned entries
                     "org.kde.dolphin", "kitty",]
                 property list<string> ignoredAppRegexes: []
@@ -293,6 +295,8 @@ Singleton {
             property JsonObject lock: JsonObject {
                 property bool hyprlock: false
                 property bool launchOnStartup: false
+                property bool clock: true
+                property bool date: true
                 property JsonObject blur: JsonObject {
                     property bool enable: true
                     property real radius: 100
@@ -309,6 +313,8 @@ Singleton {
                 // Attempt to remove dupes (the aggregator playerctl one and browsers' native ones when there's plasma browser integration)
                 property bool filterDuplicatePlayers: true
                 property int updateInterval: 1000
+                property real seek: 5
+                property real seekHold: 10
             }
 
             property JsonObject networking: JsonObject {
@@ -429,7 +435,6 @@ Singleton {
                     property int maxDpi: 6000 // Maximum DPI value allowed
                 }
                 property JsonObject cornerOpen: JsonObject {
-                    property bool enable: true
                     property bool bottom: false
                     property bool valueScroll: true
                     property bool clickless: false
@@ -526,9 +531,6 @@ Singleton {
 
             property JsonObject wallpaperSelector: JsonObject {
                 property bool systemFileDialog: false
-            }
-
-            property JsonObject windows: JsonObject {
             }
 
             property JsonObject hacks: JsonObject {

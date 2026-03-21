@@ -39,6 +39,7 @@ Singleton {
     property string cliphistDecode: FileUtils.trimFileProtocol(`/tmp/quickshell/media/cliphist`)
     property string screenshotTemp: "/tmp/quickshell/media/screenshot"
     property string wallpaperSwitchScriptPath: FileUtils.trimFileProtocol(`${Directories.scriptPath}/colors/switchwall.sh`)
+    property string cavaConfigDir: "/tmp/quickshell/cava-configs"
     property string userActions: FileUtils.trimFileProtocol(`${Directories.shellConfig}/actions`)
     property string recordScriptPath: FileUtils.trimFileProtocol(`${Directories.scriptPath}/videos/record.sh`)
     property string userAvatarPathAccountsService: FileUtils.trimFileProtocol(`/var/lib/AccountsService/icons/${SystemInfo.username}`)
@@ -53,5 +54,6 @@ Singleton {
         Quickshell.execDetached(["bash", "-c", `rm -rf '${cliphistDecode}'; mkdir -p '${cliphistDecode}'`])
         Quickshell.execDetached(["mkdir", "-p", `${userActions}`])
         Quickshell.execDetached(["rm", "-rf", `${tempImages}`])
+        Quickshell.execDetached(["bash", "-c", `mkdir -p '${cavaConfigDir}'; pactl list short modules 2>/dev/null | grep 'qs-cava-' | awk '{print $1}' | xargs -r -n1 pactl unload-module`])
     }
 }

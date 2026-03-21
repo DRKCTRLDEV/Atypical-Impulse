@@ -32,6 +32,7 @@ ContentPage {
             }
         }
         ConfigRow {
+            uniform: true
             enabled: Config.options.audio.protection.enable
             ConfigSpinBox {
                 buttonIcon: "arrow_warm_up"
@@ -222,6 +223,39 @@ ContentPage {
                         displayName: Translation.tr("12h AM/PM"),
                         value: "h:mm AP"
                     },
+                ]
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "crop_square"
+        title: Translation.tr("Display")
+
+        ContentSubsection {
+            title: Translation.tr("Screen round corner")
+
+            ConfigSelectionArray {
+                currentValue: Config.options.appearance.fakeScreenRounding
+                onSelected: newValue => {
+                    Config.options.appearance.fakeScreenRounding = newValue;
+                }
+                options: [
+                    {
+                        displayName: Translation.tr("No"),
+                        icon: "close",
+                        value: 0
+                    },
+                    {
+                        displayName: Translation.tr("Yes"),
+                        icon: "check",
+                        value: 1
+                    },
+                    {
+                        displayName: Translation.tr("When not fullscreen"),
+                        icon: "fullscreen_exit",
+                        value: 2
+                    }
                 ]
             }
         }

@@ -25,6 +25,7 @@ RippleButton {
             icon: root.buttonIcon
             opacity: root.enabled ? 1 : 0.4
             iconSize: Appearance.font.pixelSize.larger
+            Layout.leftMargin: 8
         }
         StyledText {
             id: labelWidget
@@ -38,6 +39,7 @@ RippleButton {
             id: switchWidget
             down: root.down
             Layout.fillWidth: false
+            Layout.rightMargin: 8
             checked: root.checked
             onClicked: root.clicked()
         }

@@ -89,6 +89,7 @@ ContentPage {
                         RowLayout {
                             spacing: 10
                             StyledText {
+                                Layout.fillWidth: true
                                 font.pixelSize: Appearance.font.pixelSize.small
                                 text: Translation.tr("Choose file")
                                 color: Appearance.colors.colOnSecondaryContainer
@@ -176,108 +177,60 @@ ContentPage {
             ]
         }
 
-        ConfigSwitch {
-            buttonIcon: "ev_shadow"
-            text: Translation.tr("Transparency")
-            checked: Config.options.appearance.transparency.enable
-            onCheckedChanged: {
-                Config.options.appearance.transparency.enable = checked;
-            }
-        }
-    }
-
-    ContentSection {
-        icon: "screenshot_monitor"
-        title: Translation.tr("Bar & screen")
-
         ConfigRow {
-            ContentSubsection {
-                title: Translation.tr("Bar position")
-                ConfigSelectionArray {
-                    currentValue: (Config.options.bar.bottom ? 1 : 0) | (Config.options.bar.vertical ? 2 : 0)
-                    onSelected: newValue => {
-                        Config.options.bar.bottom = (newValue & 1) !== 0;
-                        Config.options.bar.vertical = (newValue & 2) !== 0;
-                    }
-                    options: [
-                        {
-                            displayName: Translation.tr("Top"),
-                            icon: "arrow_upward",
-                            value: 0 // bottom: false, vertical: false
-                        },
-                        {
-                            displayName: Translation.tr("Left"),
-                            icon: "arrow_back",
-                            value: 2 // bottom: false, vertical: true
-                        },
-                        {
-                            displayName: Translation.tr("Bottom"),
-                            icon: "arrow_downward",
-                            value: 1 // bottom: true, vertical: false
-                        },
-                        {
-                            displayName: Translation.tr("Right"),
-                            icon: "arrow_forward",
-                            value: 3 // bottom: true, vertical: true
-                        }
-                    ]
+            uniform: true
+            ConfigSwitch {
+                buttonIcon: "ev_shadow"
+                text: Translation.tr("Transparency")
+                checked: Config.options.appearance.transparency.enable
+                onCheckedChanged: {
+                    Config.options.appearance.transparency.enable = checked;
                 }
             }
-            ContentSubsection {
-                title: Translation.tr("Bar style")
-
-                ConfigSelectionArray {
-                    currentValue: Config.options.bar.cornerStyle
-                    onSelected: newValue => {
-                        Config.options.bar.cornerStyle = newValue; // Update local copy
-                    }
-                    options: [
-                        {
-                            displayName: Translation.tr("Hug"),
-                            icon: "line_curve",
-                            value: 0
-                        },
-                        {
-                            displayName: Translation.tr("Float"),
-                            icon: "page_header",
-                            value: 1
-                        },
-                        {
-                            displayName: Translation.tr("Rect"),
-                            icon: "toolbar",
-                            value: 2
-                        }
-                    ]
+            ConfigSwitch {
+                buttonIcon: "colors"
+                text: Translation.tr("Extra bg tint")
+                checked: Config.options.appearance.extraBackgroundTint
+                onCheckedChanged: {
+                    Config.options.appearance.extraBackgroundTint = checked;
+                }
+            }
+            ConfigSwitch {
+                buttonIcon: "auto_mode"
+                text: Translation.tr("Auto")
+                enabled: Config.options.appearance.transparency.enable
+                checked: Config.options.appearance.transparency.automatic
+                onCheckedChanged: {
+                    Config.options.appearance.transparency.automatic = checked;
                 }
             }
         }
 
-        ConfigRow {
-            ContentSubsection {
-                title: Translation.tr("Screen round corner")
+        ColumnLayout {
+            visible: Config.options.appearance.transparency.enable && !Config.options.appearance.transparency.automatic
+            Layout.fillWidth: true
+            spacing: 0
 
-                ConfigSelectionArray {
-                    currentValue: Config.options.appearance.fakeScreenRounding
-                    onSelected: newValue => {
-                        Config.options.appearance.fakeScreenRounding = newValue;
-                    }
-                    options: [
-                        {
-                            displayName: Translation.tr("No"),
-                            icon: "close",
-                            value: 0
-                        },
-                        {
-                            displayName: Translation.tr("Yes"),
-                            icon: "check",
-                            value: 1
-                        },
-                        {
-                            displayName: Translation.tr("When not fullscreen"),
-                            icon: "fullscreen_exit",
-                            value: 2
-                        }
-                    ]
+            ConfigSlider {
+                Layout.fillWidth: true
+                buttonIcon: "wallpaper"
+                text: Translation.tr("Background")
+                from: 0
+                to: 1
+                value: Config.options.appearance.transparency.backgroundTransparency
+                onValueChanged: {
+                    Config.options.appearance.transparency.backgroundTransparency = value;
+                }
+            }
+            ConfigSlider {
+                Layout.fillWidth: true
+                buttonIcon: "layers"
+                text: Translation.tr("Content")
+                from: 0
+                to: 1
+                value: Config.options.appearance.transparency.contentTransparency
+                onValueChanged: {
+                    Config.options.appearance.transparency.contentTransparency = value;
                 }
             }
         }

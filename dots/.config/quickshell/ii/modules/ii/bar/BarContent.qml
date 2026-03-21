@@ -169,7 +169,7 @@ Item { // Bar content region
                 anchors.fill: parent
 
                 ClockWidget {
-                    showDate: (Config.options.bar.verbose && root.useShortenedForm < 2)
+                    date: (Config.options.bar.verbose && root.useShortenedForm < 2)
                     Layout.alignment: Qt.AlignVCenter
                     Layout.fillWidth: true
                 }
@@ -199,9 +199,9 @@ Item { // Bar content region
         implicitWidth: rightSectionRowLayout.implicitWidth
         implicitHeight: Appearance.sizes.baseBarHeight
 
-        onScrollDown: Audio.decrementVolume();
-        onScrollUp: Audio.incrementVolume();
-        onMovedAway: GlobalStates.osdVolumeOpen = false;
+        onScrollDown: Audio.decrementVolume()
+        onScrollUp: Audio.incrementVolume()
+        onMovedAway: GlobalStates.osdVolumeOpen = false
         onPressed: event => {
             if (event.button === Qt.LeftButton) {
                 GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen;

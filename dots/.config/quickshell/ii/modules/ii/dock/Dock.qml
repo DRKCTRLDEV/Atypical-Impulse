@@ -102,11 +102,12 @@ Scope { // Scope
                             property real padding: 5
 
                             VerticalButtonGroup {
+                                visible: Config.options?.dock.pinButton ?? true
                                 Layout.topMargin: Appearance.sizes.hyprlandGapsOut // why does this work
                                 GroupButton {
                                     // Pin button
-                                    baseWidth: 35
-                                    baseHeight: 35
+                                    baseWidth: 50
+                                    baseHeight: 50
                                     clickedWidth: baseWidth
                                     clickedHeight: baseHeight + 20
                                     buttonRadius: Appearance.rounding.normal
@@ -123,13 +124,18 @@ Scope { // Scope
                                     }
                                 }
                             }
-                            DockSeparator {}
+                            DockSeparator {
+                                visible: Config.options?.dock.pinButton ?? true
+                            }
                             DockApps {
                                 id: dockApps
                                 buttonPadding: dockRow.padding
                             }
-                            DockSeparator {}
+                            DockSeparator {
+                                visible: Config.options?.dock.launcherButton ?? true
+                            }
                             DockButton {
+                                visible: Config.options?.dock.launcherButton ?? true
                                 Layout.fillHeight: true
                                 onClicked: GlobalStates.overviewOpen = !GlobalStates.overviewOpen
                                 topInset: Appearance.sizes.hyprlandGapsOut + dockRow.padding

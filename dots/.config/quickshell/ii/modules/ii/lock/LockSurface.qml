@@ -68,7 +68,7 @@ MouseArea {
         }
         if (event.key === Qt.Key_Escape) { // Esc to clear
             root.context.currentText = "";
-        } 
+        }
         forceFieldFocus();
     }
     Keys.onReleased: event => {
@@ -95,6 +95,32 @@ MouseArea {
     //         text: "[[ DEBUG BYPASS ]]"
     //     }
     // }
+
+    // Clock
+    ColumnLayout {
+        visible: Config.options.lock.showClock
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+            topMargin: parent.height * 0.15
+        }
+        spacing: 0
+
+        StyledText {
+            Layout.alignment: Qt.AlignHCenter
+            font.pixelSize: Appearance.font.pixelSize.hugeass * 5
+            font.weight: Font.Light
+            color: Appearance.colors.colOnLayer0
+            text: DateTime.time
+        }
+        StyledText {
+            visible: Config.options.lock.date
+            Layout.alignment: Qt.AlignHCenter
+            font.pixelSize: Appearance.font.pixelSize.hugeass
+            color: Appearance.colors.colSubtext
+            text: DateTime.longDate
+        }
+    }
 
     // Main toolbar: password box
     Toolbar {
@@ -159,7 +185,7 @@ MouseArea {
             Keys.onPressed: event => {
                 root.context.resetClearTimer();
             }
-            
+
             layer.enabled: true
             layer.effect: OpacityMask {
                 maskSource: Rectangle {
@@ -172,16 +198,42 @@ MouseArea {
             // Shake when wrong password
             SequentialAnimation {
                 id: wrongPasswordShakeAnim
-                NumberAnimation { target: passwordBox; property: "Layout.leftMargin"; to: -30; duration: 50 }
-                NumberAnimation { target: passwordBox; property: "Layout.leftMargin"; to: 30; duration: 50 }
-                NumberAnimation { target: passwordBox; property: "Layout.leftMargin"; to: -15; duration: 40 }
-                NumberAnimation { target: passwordBox; property: "Layout.leftMargin"; to: 15; duration: 40 }
-                NumberAnimation { target: passwordBox; property: "Layout.leftMargin"; to: 0; duration: 30 }
+                NumberAnimation {
+                    target: passwordBox
+                    property: "Layout.leftMargin"
+                    to: -30
+                    duration: 50
+                }
+                NumberAnimation {
+                    target: passwordBox
+                    property: "Layout.leftMargin"
+                    to: 30
+                    duration: 50
+                }
+                NumberAnimation {
+                    target: passwordBox
+                    property: "Layout.leftMargin"
+                    to: -15
+                    duration: 40
+                }
+                NumberAnimation {
+                    target: passwordBox
+                    property: "Layout.leftMargin"
+                    to: 15
+                    duration: 40
+                }
+                NumberAnimation {
+                    target: passwordBox
+                    property: "Layout.leftMargin"
+                    to: 0
+                    duration: 30
+                }
             }
             Connections {
                 target: GlobalStates
                 function onScreenUnlockFailedChanged() {
-                    if (GlobalStates.screenUnlockFailed) wrongPasswordShakeAnim.restart();
+                    if (GlobalStates.screenUnlockFailed)
+                        wrongPasswordShakeAnim.restart();
                 }
             }
 
@@ -361,7 +413,6 @@ MouseArea {
         Layout.fillHeight: true
         Layout.leftMargin: 10
         Layout.rightMargin: 10
-        
 
         MaterialSymbol {
             anchors.verticalCenter: parent.verticalCenter

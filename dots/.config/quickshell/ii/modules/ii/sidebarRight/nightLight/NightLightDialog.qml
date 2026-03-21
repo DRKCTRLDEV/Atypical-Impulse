@@ -113,6 +113,7 @@ WindowDialog {
             text: Translation.tr("Content adjustment")
             checked: HyprlandAntiFlashbangShader.enabled
             onCheckedChanged: {
+                if (checked === HyprlandAntiFlashbangShader.enabled) return;
                 if (checked) HyprlandAntiFlashbangShader.enable()
                 else HyprlandAntiFlashbangShader.disable()
             }

@@ -156,6 +156,14 @@ Singleton {
 		}
 	}
 
+	property bool canSeek: this.activePlayer?.canSeek ?? false;
+	function seek(amount: real) {
+		if (this.canSeek && this.activePlayer) {
+			const newPos = this.activePlayer.position + amount;
+			this.activePlayer.position = Math.max(0, Math.min(this.activePlayer.length, newPos));
+		}
+	}
+
 	property bool canChangeVolume: this.activePlayer && this.activePlayer.volumeSupported && this.activePlayer.canControl;
 
 	property bool loopSupported: this.activePlayer && this.activePlayer.loopSupported && this.activePlayer.canControl;
@@ -200,5 +208,6 @@ Singleton {
 		function playPause(): void { root.togglePlaying(); }
 		function previous(): void { root.previous(); }
 		function next(): void { root.next(); }
+		function seek(amount: real): void { root.seek(amount); }
 	}
 }

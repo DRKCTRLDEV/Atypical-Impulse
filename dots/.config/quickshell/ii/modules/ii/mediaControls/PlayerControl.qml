@@ -77,7 +77,7 @@ Item { // Player instance
         id: coverArtDownloader
         property string targetFile: root.artUrl
         property string artFilePath: root.artFilePath
-        command: [ "bash", "-c", `[ -f ${artFilePath} ] || curl -4 -sSL '${targetFile}' -o '${artFilePath}'` ]
+        command: ["bash", "-c", `[ -f ${artFilePath} ] || curl -4 -sSL '${targetFile}' -o '${artFilePath}'`]
         onExited: (exitCode, exitStatus) => {
             root.downloaded = true;
         }
@@ -419,7 +419,23 @@ Item { // Player instance
                             TrackChangeButton {
                                 iconName: "skip_previous"
                                 Layout.leftMargin: -4
-                                releaseAction: () => root.player?.previous()
+                                visible: (root.player?.canGoPrevious ?? false) || (root.player?.canSeek ?? false)
+                                property bool skipRelease: false
+                                releaseAction: () => {
+                                    if (skipRelease) {
+                                        skipRelease = false;
+                                        return;
+                                    }
+                                    if (root.player?.canGoPrevious)
+                                        root.player.previous();
+                                    else
+                                        root.player.position = Math.max(0, root.player.position - Config.options.media.seek);
+                                }
+                                altAction: () => {
+                                    skipRelease = true;
+                                    const amount = (root.player?.canGoPrevious ?? false) ? Config.options.media.seek : Config.options.media.seekHold;
+                                    root.player.position = Math.max(0, root.player.position - amount);
+                                }
                             }
                             Item {
                                 id: progressBarContainer
@@ -472,7 +488,7 @@ Item { // Player instance
                                     }
                                     active: !(root.player?.canSeek ?? false)
                                     sourceComponent: StyledProgressBar {
-                                        wavy: root.player?.isPlaying
+                                        wavy: root.player?.isPlaying ?? false
                                         highlightColor: blendedColors.colPrimary
                                         trackColor: blendedColors.colSecondaryContainer
                                         value: root.player?.position / root.player?.length
@@ -482,7 +498,23 @@ Item { // Player instance
                             TrackChangeButton {
                                 iconName: "skip_next"
                                 Layout.rightMargin: -3 // visually neater,
-                                releaseAction: () => root.player?.next()
+                                visible: (root.player?.canGoNext ?? false) || (root.player?.canSeek ?? false)
+                                property bool skipRelease: false
+                                releaseAction: () => {
+                                    if (skipRelease) {
+                                        skipRelease = false;
+                                        return;
+                                    }
+                                    if (root.player?.canGoNext)
+                                        root.player.next();
+                                    else
+                                        root.player.position = Math.min(root.player.length, root.player.position + Config.options.media.seek);
+                                }
+                                altAction: () => {
+                                    skipRelease = true;
+                                    const amount = (root.player?.canGoNext ?? false) ? Config.options.media.seek : Config.options.media.seekHold;
+                                    root.player.position = Math.min(root.player.length, root.player.position + amount);
+                                }
                             }
                         }
                     }

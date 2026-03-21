@@ -21,6 +21,7 @@ ContentPage {
         ConfigSwitch {
             buttonIcon: "tv_options_input_settings"
             text: Translation.tr("Qt apps")
+            enabled: Config.options.appearance.wallpaperTheming.appsAndShell
             checked: Config.options.appearance.wallpaperTheming.qtApps
             onCheckedChanged: {
                 Config.options.appearance.wallpaperTheming.qtApps = checked;
@@ -32,6 +33,7 @@ ContentPage {
         ConfigSwitch {
             buttonIcon: "terminal"
             text: Translation.tr("Terminal")
+            enabled: Config.options.appearance.wallpaperTheming.appsAndShell
             checked: Config.options.appearance.wallpaperTheming.terminal
             onCheckedChanged: {
                 Config.options.appearance.wallpaperTheming.terminal = checked;
@@ -42,6 +44,7 @@ ContentPage {
         }
         ConfigRow {
             uniform: true
+            enabled: Config.options.appearance.wallpaperTheming.terminal
             ConfigSwitch {
                 buttonIcon: "dark_mode"
                 text: Translation.tr("Force dark mode in terminal")
@@ -56,6 +59,7 @@ ContentPage {
         }
 
         ConfigSpinBox {
+            enabled: Config.options.appearance.wallpaperTheming.terminal
             buttonIcon: "invert_colors"
             text: Translation.tr("Terminal: Harmony (%)")
             value: Config.options.appearance.wallpaperTheming.terminalGenerationProps.harmony * 100
@@ -67,6 +71,7 @@ ContentPage {
             }
         }
         ConfigSpinBox {
+            enabled: Config.options.appearance.wallpaperTheming.terminal
             buttonIcon: "gradient"
             text: Translation.tr("Terminal: Harmonize threshold")
             value: Config.options.appearance.wallpaperTheming.terminalGenerationProps.harmonizeThreshold
@@ -78,6 +83,7 @@ ContentPage {
             }
         }
         ConfigSpinBox {
+            enabled: Config.options.appearance.wallpaperTheming.terminal
             buttonIcon: "format_color_text"
             text: Translation.tr("Terminal: Foreground boost (%)")
             value: Config.options.appearance.wallpaperTheming.terminalGenerationProps.termFgBoost * 100
@@ -86,6 +92,30 @@ ContentPage {
             stepSize: 10
             onValueChanged: {
                 Config.options.appearance.wallpaperTheming.terminalGenerationProps.termFgBoost = value / 100;
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "healing"
+        title: Translation.tr("Hacks")
+        ConfigSwitch {
+            buttonIcon: "grid_on"
+            text: Translation.tr("Dead pixel workaround")
+            checked: Config.options.interactions.deadPixelWorkaround.enable
+            onCheckedChanged: {
+                Config.options.interactions.deadPixelWorkaround.enable = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Fix 1px gap on the right edge in Hyprland")
+            }
+        }
+        ConfigSwitch {
+            buttonIcon: "ad"
+            text: Translation.tr('Use System File Dialog')
+            checked: Config.options.wallpaperSelector.systemFileDialog
+            onCheckedChanged: {
+                Config.options.wallpaperSelector.systemFileDialog = checked;
             }
         }
     }

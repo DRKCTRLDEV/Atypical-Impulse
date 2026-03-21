@@ -59,9 +59,19 @@ ContentPage {
                     ]
                 }
             }
-            ContentSubsection {
-                title: Translation.tr("Automatically hide")
+            ColumnLayout {
                 Layout.fillWidth: false
+                Layout.alignment: Qt.AlignRight
+                Layout.topMargin: 4
+                spacing: 2
+
+                RowLayout {
+                    spacing: 0
+                    Item { Layout.fillWidth: true }
+                    ContentSubsectionLabel {
+                        text: Translation.tr("Automatically hide")
+                    }
+                }
 
                 ConfigSelectionArray {
                     currentValue: Config.options.bar.autoHide.enable
@@ -115,9 +125,19 @@ ContentPage {
                 }
             }
 
-            ContentSubsection {
-                title: Translation.tr("Group style")
+            ColumnLayout {
                 Layout.fillWidth: false
+                Layout.alignment: Qt.AlignRight
+                Layout.topMargin: 4
+                spacing: 2
+
+                RowLayout {
+                    spacing: 0
+                    Item { Layout.fillWidth: true }
+                    ContentSubsectionLabel {
+                        text: Translation.tr("Group style")
+                    }
+                }
 
                 ConfigSelectionArray {
                     currentValue: Config.options.bar.borderless
@@ -137,6 +157,41 @@ ContentPage {
                         }
                     ]
                 }
+            }
+        }
+
+        ConfigRow {
+            uniform: true
+            ConfigSwitch {
+                buttonIcon: "background_replace"
+                text: Translation.tr("Show background")
+                checked: Config.options.bar.background
+                onCheckedChanged: {
+                    Config.options.bar.background = checked;
+                }
+            }
+            ConfigSwitch {
+                buttonIcon: "shadow"
+                text: Translation.tr("Float shadow")
+                enabled: Config.options.bar.cornerStyle === 1
+                checked: Config.options.bar.floatStyleShadow
+                onCheckedChanged: {
+                    Config.options.bar.floatStyleShadow = checked;
+                }
+                StyledToolTip {
+                    text: Translation.tr("Show shadow when corner style is Float")
+                }
+            }
+        }
+        ConfigSwitch {
+            buttonIcon: "info"
+            text: Translation.tr("Verbose mode")
+            checked: Config.options.bar.verbose
+            onCheckedChanged: {
+                Config.options.bar.verbose = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Show extra details in bar widgets")
             }
         }
     }
@@ -160,6 +215,30 @@ ContentPage {
             checked: Config.options.tray.monochromeIcons
             onCheckedChanged: {
                 Config.options.tray.monochromeIcons = checked;
+            }
+        }
+
+        ConfigSwitch {
+            buttonIcon: "filter_alt"
+            text: Translation.tr('Filter passive items')
+            checked: Config.options.tray.filterPassive
+            onCheckedChanged: {
+                Config.options.tray.filterPassive = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Hide passive (status-only) tray items")
+            }
+        }
+
+        ConfigSwitch {
+            buttonIcon: "badge"
+            text: Translation.tr('Show item IDs')
+            checked: Config.options.tray.itemId
+            onCheckedChanged: {
+                Config.options.tray.itemId = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Display service names in the tray")
             }
         }
     }
@@ -233,6 +312,30 @@ ContentPage {
                 checked: Config.options.bar.utilButtons.screenRecord
                 onCheckedChanged: {
                     Config.options.bar.utilButtons.screenRecord = checked;
+                }
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "memory"
+        title: Translation.tr("Resources")
+        ConfigRow {
+            uniform: true
+            ConfigSwitch {
+                buttonIcon: "swap_horiz"
+                text: Translation.tr("Always show swap")
+                checked: Config.options.bar.resources.alwaysShowSwap
+                onCheckedChanged: {
+                    Config.options.bar.resources.alwaysShowSwap = checked;
+                }
+            }
+            ConfigSwitch {
+                buttonIcon: "developer_board"
+                text: Translation.tr("Always show CPU")
+                checked: Config.options.bar.resources.alwaysShowCpu
+                onCheckedChanged: {
+                    Config.options.bar.resources.alwaysShowCpu = checked;
                 }
             }
         }

@@ -91,179 +91,171 @@ ContentPage {
             }
         }
 
-        MaterialTextArea {
-            Layout.fillWidth: true
-            placeholderText: Translation.tr("File manager command (e.g. xdg-open, nautilus, thunar)")
-            text: Config.options.apps.fileManager
-            wrapMode: TextEdit.Wrap
-            onTextChanged: {
-                Config.options.apps.fileManager = text;
-            }
-        }
-    }
+        ContentSection {
+            icon: "search"
+            title: Translation.tr("Search")
 
-    ContentSection {
-        icon: "search"
-        title: Translation.tr("Search")
-
-        ConfigSwitch {
-            text: Translation.tr("Use Levenshtein distance-based algorithm instead of fuzzy")
-            checked: Config.options.search.sloppy
-            onCheckedChanged: {
-                Config.options.search.sloppy = checked;
-            }
-            StyledToolTip {
-                text: Translation.tr("Could be better if you make a ton of typos,\nbut results can be weird and might not work with acronyms\n(e.g. \"GIMP\" might not give you the paint program)")
-            }
-        }
-
-        ContentSubsection {
-            title: Translation.tr("Prefixes")
-            ConfigRow {
-                uniform: true
-                MaterialTextArea {
-                    Layout.fillWidth: true
-                    placeholderText: Translation.tr("Action")
-                    text: Config.options.search.prefix.action
-                    wrapMode: TextEdit.Wrap
-                    onTextChanged: {
-                        Config.options.search.prefix.action = text;
-                    }
-                }
-                MaterialTextArea {
-                    Layout.fillWidth: true
-                    placeholderText: Translation.tr("Clipboard")
-                    text: Config.options.search.prefix.clipboard
-                    wrapMode: TextEdit.Wrap
-                    onTextChanged: {
-                        Config.options.search.prefix.clipboard = text;
-                    }
-                }
-                MaterialTextArea {
-                    Layout.fillWidth: true
-                    placeholderText: Translation.tr("Emojis")
-                    text: Config.options.search.prefix.emojis
-                    wrapMode: TextEdit.Wrap
-                    onTextChanged: {
-                        Config.options.search.prefix.emojis = text;
-                    }
-                }
-            }
-
-            ConfigRow {
-                uniform: true
-                MaterialTextArea {
-                    Layout.fillWidth: true
-                    placeholderText: Translation.tr("Math")
-                    text: Config.options.search.prefix.math
-                    wrapMode: TextEdit.Wrap
-                    onTextChanged: {
-                        Config.options.search.prefix.math = text;
-                    }
-                }
-                MaterialTextArea {
-                    Layout.fillWidth: true
-                    placeholderText: Translation.tr("Shell command")
-                    text: Config.options.search.prefix.shellCommand
-                    wrapMode: TextEdit.Wrap
-                    onTextChanged: {
-                        Config.options.search.prefix.shellCommand = text;
-                    }
-                }
-                MaterialTextArea {
-                    Layout.fillWidth: true
-                    placeholderText: Translation.tr("Web search")
-                    text: Config.options.search.prefix.webSearch
-                    wrapMode: TextEdit.Wrap
-                    onTextChanged: {
-                        Config.options.search.prefix.webSearch = text;
-                    }
-                }
-            }
-        }
-        ContentSubsection {
-            title: Translation.tr("Web search")
-            MaterialTextArea {
-                Layout.fillWidth: true
-                placeholderText: Translation.tr("Base URL")
-                text: Config.options.search.engineBaseUrl
-                wrapMode: TextEdit.Wrap
-                onTextChanged: {
-                    Config.options.search.engineBaseUrl = text;
-                }
-            }
-        }
-    }
-
-    // There's no update indicator in ii for now so we shouldn't show this yet
-    // ContentSection {
-    //     icon: "deployed_code_update"
-    //     title: Translation.tr("System updates (Arch only)")
-
-    //     ConfigSwitch {
-    //         text: Translation.tr("Enable update checks")
-    //         checked: Config.options.updates.check
-    //         onCheckedChanged: {
-    //             Config.options.updates.check = checked;
-    //         }
-    //     }
-
-    //     ConfigSpinBox {
-    //         buttonIcon: "av_timer"
-    //         text: Translation.tr("Check interval (mins)")
-    //         value: Config.options.updates.checkInterval
-    //         from: 60
-    //         to: 1440
-    //         stepSize: 60
-    //         onValueChanged: {
-    //             Config.options.updates.checkInterval = value;
-    //         }
-    //     }
-    // }
-
-    ContentSection {
-        icon: "weather_mix"
-        title: Translation.tr("Weather")
-        ConfigRow {
             ConfigSwitch {
-                buttonIcon: "assistant_navigation"
-                text: Translation.tr("Enable GPS based location")
-                checked: Config.options.bar.weather.gps
+                text: Translation.tr("Use Levenshtein distance-based algorithm instead of fuzzy")
+                checked: Config.options.search.sloppy
                 onCheckedChanged: {
-                    Config.options.bar.weather.gps = checked;
-                }
-            }
-            ConfigSwitch {
-                buttonIcon: "thermometer"
-                text: Translation.tr("Fahrenheit unit")
-                checked: Config.options.bar.weather.imperial
-                onCheckedChanged: {
-                    Config.options.bar.weather.imperial = checked;
+                    Config.options.search.sloppy = checked;
                 }
                 StyledToolTip {
-                    text: Translation.tr("It may take a few seconds to update")
+                    text: Translation.tr("Could be better if you make a ton of typos,\nbut results can be weird and might not work with acronyms\n(e.g. \"GIMP\" might not give you the paint program)")
+                }
+            }
+
+            ContentSubsection {
+                title: Translation.tr("Prefixes")
+                ConfigRow {
+                    uniform: true
+                    MaterialTextArea {
+                        Layout.fillWidth: true
+                        placeholderText: Translation.tr("Action")
+                        text: Config.options.search.prefix.action
+                        wrapMode: TextEdit.Wrap
+                        onTextChanged: {
+                            Config.options.search.prefix.action = text;
+                        }
+                    }
+                    MaterialTextArea {
+                        Layout.fillWidth: true
+                        placeholderText: Translation.tr("Clipboard")
+                        text: Config.options.search.prefix.clipboard
+                        wrapMode: TextEdit.Wrap
+                        onTextChanged: {
+                            Config.options.search.prefix.clipboard = text;
+                        }
+                    }
+                    MaterialTextArea {
+                        Layout.fillWidth: true
+                        placeholderText: Translation.tr("Emojis")
+                        text: Config.options.search.prefix.emojis
+                        wrapMode: TextEdit.Wrap
+                        onTextChanged: {
+                            Config.options.search.prefix.emojis = text;
+                        }
+                    }
+                }
+
+                ConfigRow {
+                    uniform: true
+                    MaterialTextArea {
+                        Layout.fillWidth: true
+                        placeholderText: Translation.tr("Math")
+                        text: Config.options.search.prefix.math
+                        wrapMode: TextEdit.Wrap
+                        onTextChanged: {
+                            Config.options.search.prefix.math = text;
+                        }
+                    }
+                    MaterialTextArea {
+                        Layout.fillWidth: true
+                        placeholderText: Translation.tr("Shell command")
+                        text: Config.options.search.prefix.shellCommand
+                        wrapMode: TextEdit.Wrap
+                        onTextChanged: {
+                            Config.options.search.prefix.shellCommand = text;
+                        }
+                    }
+                    MaterialTextArea {
+                        Layout.fillWidth: true
+                        placeholderText: Translation.tr("Web search")
+                        text: Config.options.search.prefix.webSearch
+                        wrapMode: TextEdit.Wrap
+                        onTextChanged: {
+                            Config.options.search.prefix.webSearch = text;
+                        }
+                    }
+                }
+            }
+            ContentSubsection {
+                title: Translation.tr("Web search")
+                MaterialTextArea {
+                    Layout.fillWidth: true
+                    placeholderText: Translation.tr("Base URL")
+                    text: Config.options.search.engineBaseUrl
+                    wrapMode: TextEdit.Wrap
+                    onTextChanged: {
+                        Config.options.search.engineBaseUrl = text;
+                    }
                 }
             }
         }
 
-        MaterialTextArea {
-            Layout.fillWidth: true
-            placeholderText: Translation.tr("City name")
-            text: Config.options.bar.weather.city
-            wrapMode: TextEdit.Wrap
-            onTextChanged: {
-                Config.options.bar.weather.city = text;
+        // There's no update indicator in ii for now so we shouldn't show this yet
+        // ContentSection {
+        //     icon: "deployed_code_update"
+        //     title: Translation.tr("System updates (Arch only)")
+
+        //     ConfigSwitch {
+        //         text: Translation.tr("Enable update checks")
+        //         checked: Config.options.updates.check
+        //         onCheckedChanged: {
+        //             Config.options.updates.check = checked;
+        //         }
+        //     }
+
+        //     ConfigSpinBox {
+        //         buttonIcon: "av_timer"
+        //         text: Translation.tr("Check interval (mins)")
+        //         value: Config.options.updates.checkInterval
+        //         from: 60
+        //         to: 1440
+        //         stepSize: 60
+        //         onValueChanged: {
+        //             Config.options.updates.checkInterval = value;
+        //         }
+        //     }
+        // }
+
+        ContentSection {
+            icon: "weather_mix"
+            title: Translation.tr("Weather")
+            enabled: Config.options.bar.weather.enable
+            ConfigRow {
+                uniform: true
+                ConfigSwitch {
+                    buttonIcon: "assistant_navigation"
+                    text: Translation.tr("Enable GPS based location")
+                    checked: Config.options.bar.weather.gps
+                    onCheckedChanged: {
+                        Config.options.bar.weather.gps = checked;
+                    }
+                }
+                ConfigSwitch {
+                    buttonIcon: "thermometer"
+                    text: Translation.tr("Fahrenheit unit")
+                    checked: Config.options.bar.weather.imperial
+                    onCheckedChanged: {
+                        Config.options.bar.weather.imperial = checked;
+                    }
+                    StyledToolTip {
+                        text: Translation.tr("It may take a few seconds to update")
+                    }
+                }
             }
-        }
-        ConfigSpinBox {
-            buttonIcon: "av_timer"
-            text: Translation.tr("Polling interval (m)")
-            value: Config.options.bar.weather.fetchInterval
-            from: 5
-            to: 50
-            stepSize: 5
-            onValueChanged: {
-                Config.options.bar.weather.fetchInterval = value;
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                placeholderText: Translation.tr("City name")
+                text: Config.options.bar.weather.city
+                wrapMode: TextEdit.Wrap
+                onTextChanged: {
+                    Config.options.bar.weather.city = text;
+                }
+            }
+            ConfigSpinBox {
+                buttonIcon: "av_timer"
+                text: Translation.tr("Polling interval (m)")
+                value: Config.options.bar.weather.fetchInterval
+                from: 5
+                to: 50
+                stepSize: 5
+                onValueChanged: {
+                    Config.options.bar.weather.fetchInterval = value;
+                }
             }
         }
     }
