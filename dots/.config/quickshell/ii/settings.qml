@@ -11,7 +11,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
 import Quickshell
-import Quickshell.Io
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
@@ -63,48 +62,6 @@ ApplicationWindow {
     ]
     property int currentPage: 0
 
-    // Navigation stack for sub-page navigation
-    property var navStack: []
-
-    // ── Search system (interface only) ──
-    property bool searchVisible: false
-    property string searchQuery: ""
-
-    // Search results - placeholder for interface (no backend)
-    property var searchResults: {
-        const q = searchQuery.toLowerCase().trim();
-        if (q.length < 2)
-            return [];
-        return [];
-    }
-
-    function navigateToSearchResult(result) {
-        searchVisible = false;
-        searchQuery = "";
-    }
-
-    function pushPage(name, icon, source) {
-        let stack = navStack.slice();
-        stack.push({
-            name: name,
-            icon: icon,
-            source: source
-        });
-        navStack = stack;
-    }
-
-    function popToLevel(level) {
-        if (level < 0)
-            return;
-        navStack = navStack.slice(0, level);
-    }
-
-    function currentSource() {
-        if (navStack.length > 0)
-            return navStack[navStack.length - 1].source;
-        return pages[currentPage].component;
-    }
-
     visible: true
     onClosing: Qt.quit()
     title: "illogical-impulse Settings"
@@ -125,7 +82,6 @@ ApplicationWindow {
             fill: parent
             margins: contentPadding
         }
-        focus: true
 
         Keys.onPressed: event => {
             if (event.modifiers === Qt.ControlModifier) {
@@ -142,17 +98,6 @@ ApplicationWindow {
                     root.currentPage = (root.currentPage - 1 + root.pages.length) % root.pages.length;
                     event.accepted = true;
                 }
-            }
-            if (event.key === Qt.Key_F && event.modifiers === Qt.ControlModifier) {
-                root.searchVisible = !root.searchVisible;
-                if (root.searchVisible)
-                    searchField.forceActiveFocus();
-                event.accepted = true;
-            }
-            if (event.key === Qt.Key_Escape && root.searchVisible) {
-                root.searchVisible = false;
-                root.searchQuery = "";
-                event.accepted = true;
             }
         }
 
@@ -200,25 +145,55 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: contentPadding
-
             Item {
                 id: navRailWrapper
                 Layout.fillHeight: true
-                Layout.leftMargin: 5
-                Layout.rightMargin: 5
-                implicitWidth: navRail.expanded ? 150 : 56
+                Layout.margins: 5
+                implicitWidth: navRail.expanded ? 150 : fab.baseSize
                 Behavior on implicitWidth {
                     animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
                 }
-
-                NavigationRail {
+                NavigationRail { // Window content with navigation rail and content pane
                     id: navRail
                     anchors {
                         left: parent.left
                         top: parent.top
                         bottom: parent.bottom
                     }
-                    expanded: root.width > 900   // no expand/contract button needed
+                    spacing: 10
+                    expanded: root.width > 900
+
+                    NavigationRailExpandButton {
+                        focus: root.visible
+                    }
+
+                    FloatingActionButton {
+                        id: fab
+                        property bool justCopied: false
+                        iconText: justCopied ? "check" : "edit"
+                        buttonText: justCopied ? Translation.tr("Path copied") : Translation.tr("Config file")
+                        expanded: navRail.expanded
+                        downAction: () => {
+                            Qt.openUrlExternally(`${Directories.config}/illogical-impulse/config.json`);
+                        }
+                        altAction: () => {
+                            Quickshell.clipboardText = CF.FileUtils.trimFileProtocol(`${Directories.config}/illogical-impulse/config.json`);
+                            fab.justCopied = true;
+                            revertTextTimer.restart();
+                        }
+
+                        Timer {
+                            id: revertTextTimer
+                            interval: 1500
+                            onTriggered: {
+                                fab.justCopied = false;
+                            }
+                        }
+
+                        StyledToolTip {
+                            text: Translation.tr("Open the shell config file\nAlternatively right-click to copy path")
+                        }
+                    }
 
                     NavigationRailTabArray {
                         currentIndex: root.currentPage
@@ -250,153 +225,6 @@ ApplicationWindow {
                 Layout.fillHeight: true
                 color: Appearance.m3colors.m3surfaceContainerLow
                 radius: Appearance.rounding.windowRounding - root.contentPadding
-                clip: true
-
-                // Search overlay
-                Item {
-                    id: searchOverlay
-                    anchors.fill: parent
-                    visible: opacity > 0
-                    z: 100
-                    opacity: root.searchVisible ? 1 : 0
-                    
-                    Behavior on opacity {
-                        animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-                    }
-
-                    ColumnLayout {
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            bottom: parent.bottom
-                            margins: 0
-                        }
-                        spacing: 6
-
-                        // Search field - pill shaped
-                        Rectangle {
-                            id: searchFieldContainer
-                            Layout.fillWidth: true
-                            height: 48
-                            radius: Appearance.rounding.small
-                            color: Appearance.m3colors.m3surfaceContainerHigh
-                            scale: root.searchVisible ? 1 : 0.7
-                            opacity: root.searchVisible ? 1 : 0
-                            
-                            transformOrigin: Item.Center
-                            
-                            Behavior on scale {
-                                animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
-                            }
-                            Behavior on opacity {
-                                animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
-                            }
-
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.leftMargin: 12
-                                anchors.rightMargin: 12
-
-                                MaterialSymbol {
-                                    id: searchIcon
-                                    text: "search"
-                                    iconSize: 24
-                                    color: Appearance.colors.colOnSurfaceVariant
-                                }
-
-                                TextField {
-                                    id: searchField
-                                    Layout.fillWidth: true
-                                    placeholderText: Translation.tr("Search settings...")
-                                    placeholderTextColor: Appearance.colors.colOnSurfaceVariant
-                                    text: root.searchQuery
-                                    onTextChanged: root.searchQuery = text
-                                    background: Item {}
-                                    font.pixelSize: Appearance.font.pixelSize.large
-                                    color: Appearance.colors.colOnSurface
-
-                                    Keys.onPressed: event => {
-                                        if (event.key === Qt.Key_Escape) {
-                                            root.searchVisible = false;
-                                            root.searchQuery = "";
-                                            event.accepted = true;
-                                        }
-                                    }
-                                }
-
-                                RippleButton {
-                                    id: clearButton
-                                    implicitWidth: 32
-                                    implicitHeight: 48
-                                    buttonRadius: Appearance.rounding.small
-                                    opacity: root.searchQuery.length > 0 ? 1 : 0
-                                    scale: root.searchQuery.length > 0 ? 1 : 0.8
-                                    visible: opacity > 0
-                                    onClicked: {
-                                        root.searchQuery = "";
-                                        searchField.forceActiveFocus();
-                                    }
-                                    contentItem: MaterialSymbol {
-                                        anchors.centerIn: parent
-                                        text: "close"
-                                        iconSize: 24
-                                        color: Appearance.colors.colOnSurfaceVariant
-                                    }
-                                    
-                                    Behavior on opacity {
-                                        animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-                                    }
-                                    Behavior on scale {
-                                        animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-                                    }
-                                }
-                            }
-                        }
-
-                        // Search results (placeholder - no backend) - above search box, full width
-                        ColumnLayout {
-                            id: searchResultsContainer
-                            Layout.fillWidth: true
-                            spacing: 6
-                            opacity: root.searchResults.length > 0 ? 1 : 0
-                            visible: opacity > 0
-                            
-                            Behavior on opacity {
-                                animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
-                            }
-
-                            Repeater {
-                                model: root.searchResults
-                                RippleButton {
-                                    required property var modelData
-                                    required property int index
-                                    implicitHeight: 48
-                                    Layout.fillWidth: true
-                                    buttonRadius: 8
-                                    colBackground: Appearance.colors.colSecondaryContainer
-                                    opacity: searchResultsContainer.opacity
-                                    onClicked: root.navigateToSearchResult(modelData)
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 16
-                                        anchors.rightMargin: 16
-                                        spacing: 12
-                                        MaterialSymbol {
-                                            text: "search"
-                                            iconSize: 20
-                                            color: Appearance.colors.colOnSecondaryContainer
-                                        }
-                                        StyledText {
-                                            text: modelData.label
-                                            font.pixelSize: Appearance.font.pixelSize.small
-                                            color: Appearance.colors.colOnSecondaryContainer
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
                 Loader {
                     id: pageLoader
@@ -411,21 +239,8 @@ ApplicationWindow {
                     Connections {
                         target: root
                         function onCurrentPageChanged() {
-                            root.navStack = [];
                             switchAnim.complete();
                             switchAnim.start();
-                        }
-                        function onNavStackChanged() {
-                            switchAnim.complete();
-                            switchAnim.start();
-                        }
-                    }
-
-                    Connections {
-                        target: pageLoader.item
-                        ignoreUnknownSignals: true
-                        function onNavigateTo(name, icon, source) {
-                            root.pushPage(name, icon, source);
                         }
                     }
 
@@ -445,7 +260,7 @@ ApplicationWindow {
                             PropertyAction {
                                 target: pageLoader
                                 property: "source"
-                                value: root.currentSource()
+                                value: root.pages[root.currentPage].component
                             }
                             PropertyAction {
                                 target: pageLoader
@@ -478,4 +293,3 @@ ApplicationWindow {
         }
     }
 }
-
