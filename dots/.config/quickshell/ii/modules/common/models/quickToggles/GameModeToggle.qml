@@ -1,17 +1,19 @@
 import QtQuick
-import Quickshell.Io
+import qs.modules.common
 import qs.modules.common.models.hyprland
 import qs.services
 
 QuickToggleModel {
-    id: root
     name: Translation.tr("Game mode")
     toggled: !confOpt.value
     icon: "gamepad"
 
+    property int previousCornerStyle: 0
+
     mainAction: () => {
-        root.toggled = !root.toggled;
-        if (root.toggled) {
+        if (confOpt.value) {
+            previousCornerStyle = Config.options.bar.cornerStyle;
+            Config.options.bar.cornerStyle = 2;
             HyprlandConfig.setMany({
                 "animations:enabled": 0,
                 "decoration:shadow:enabled": 0,
@@ -23,16 +25,8 @@ QuickToggleModel {
                 "general:allow_tearing": 1
             });
         } else {
-            HyprlandConfig.resetMany([ //
-                "animations:enabled", //
-                "decoration:shadow:enabled", //
-                "decoration:blur:enabled", //
-                "general:gaps_in", //
-                "general:gaps_out", //
-                "general:border_size", //
-                "decoration:rounding", //
-                "general:allow_tearing", //
-            ]);
+            Config.options.bar.cornerStyle = previousCornerStyle;
+            HyprlandConfig.resetMany(["animations:enabled", "decoration:shadow:enabled", "decoration:blur:enabled", "general:gaps_in", "general:gaps_out", "general:border_size", "decoration:rounding", "general:allow_tearing"]);
         }
     }
 

@@ -11,7 +11,7 @@ QuickToggleModel {
     toggled: HyprlandAntiFlashbangShader.enabled
 
     mainAction: () => {
-        HyprlandAntiFlashbangShader.toggle()
+        HyprlandAntiFlashbangShader.toggle();
     }
     hasMenu: true
 }

@@ -8,47 +8,36 @@ import Quickshell.Hyprland
 import qs.modules.common
 import qs.modules.common.functions
 
-/**
- * Configs Hyprland
- */
 Singleton {
     id: root
-    
-    signal reloaded()
+
+    signal reloaded
 
     readonly property string configuratorScriptPath: Quickshell.shellPath("scripts/hyprland/hyprconfigurator.py")
     readonly property string shellOverridesPath: FileUtils.trimFileProtocol(`${Directories.config}/hypr/hyprland/shellOverrides/main.conf`)
 
     function set(key: string, value: var) {
-        Quickshell.execDetached(["bash", "-c", //
-            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} --set "${key}" "${value}"` //
-        ])
+        Quickshell.execDetached(["bash", "-c", `${root.configuratorScriptPath} --file ${root.shellOverridesPath} --set "${key}" "${value}" && hyprctl reload`]);
     }
-    
+
     function setMany(entries: var) {
-        let args = ""
+        let args = "";
         for (let key in entries) {
-            args += `--set "${key}" "${entries[key]}" `
+            args += `--set "${key}" "${entries[key]}" `;
         }
-        Quickshell.execDetached(["bash", "-c", //
-            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args}` //
-        ])
+        Quickshell.execDetached(["bash", "-c", `${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args} && hyprctl reload`]);
     }
-    
+
     function reset(key: string) {
-        Quickshell.execDetached(["bash", "-c", //
-            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} --reset "${key}"` //
-        ])
+        Quickshell.execDetached(["bash", "-c", `${root.configuratorScriptPath} --file ${root.shellOverridesPath} --reset "${key}" && hyprctl reload`]);
     }
-    
-    function resetMany(keys: list<string>) {
-        let args = ""
+
+    function resetMany(keys: var) {
+        let args = "";
         for (let i = 0; i < keys.length; i++) {
-            args += `--reset "${keys[i]}" `
+            args += `--reset "${keys[i]}" `;
         }
-        Quickshell.execDetached(["bash", "-c", //
-            `${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args}` //
-        ])
+        Quickshell.execDetached(["bash", "-c", `${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args} && hyprctl reload`]);
     }
 
     Connections {
@@ -56,7 +45,7 @@ Singleton {
 
         function onRawEvent(event) {
             if (event.name == "configreloaded") {
-                root.reloaded()
+                root.reloaded();
             }
         }
     }
