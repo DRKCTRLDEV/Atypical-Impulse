@@ -67,6 +67,8 @@ Item {
         "Slash": "/",
         "Hash": "#",
         "Return": "Enter",
+        "Delete": "Del",
+        "Escape": "Esc",
         // "Shift": "",
       },
       !!Config.options.cheatsheet.superKey ? {
@@ -125,6 +127,12 @@ Item {
                                         var result = [];
                                         for (var i = 0; i < keybindSection.modelData.keybinds.length; i++) {
                                             const keybind = keybindSection.modelData.keybinds[i];
+
+                                            if (!(Config?.options.overview.enable ?? true) 
+                                                && (keybind.comment.toLowerCase().includes("overview")
+                                                    || (keybind.params && keybind.params.toLowerCase().includes("overview")))) {
+                                                continue;
+                                            }
 
                                             if (!Config.options.cheatsheet.splitButtons) {
                                                 for (var j = 0; j < keybind.mods.length; j++) {
