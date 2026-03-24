@@ -114,9 +114,7 @@ Singleton {
             }
 
             property JsonObject audio: JsonObject {
-                // Values in %
                 property JsonObject protection: JsonObject {
-                    // Prevent sudden bangs
                     property bool enable: false
                     property real maxAllowedIncrease: 10
                     property real maxAllowed: 99
@@ -130,7 +128,6 @@ Singleton {
                 property string manageUser: "kcmshell6 kcm_users"
                 property string networkEthernet: "kcmshell6 kcm_networkmanagement"
                 property string taskManager: "plasma-systemmonitor --page-name Processes"
-                property string terminal: "kitty -1" // This is only for shell actions
                 property string update: "kitty -1 --hold=yes fish -i -c 'pkexec pacman -Syu'"
                 property string volumeMixer: `~/.config/hypr/hyprland/scripts/launch_available.sh "pavucontrol-qt" "pavucontrol"`
             }
@@ -236,7 +233,7 @@ Singleton {
             }
 
             property JsonObject crosshair: JsonObject {
-                // Valorant crosshair format. Use https://www.vcrdb.net/builder
+                // Valorant crosshair format. // https://www.vcrdb.net/builder
                 property string code: "0;P;d;1;0l;10;0o;2;1b;0"
             }
 

@@ -43,9 +43,9 @@ Singleton {
                 const actionName = fileName.replace(/\.[^/.]+$/, ""); // strip extension
                 actions.push({
                     action: actionName,
-                    execute: ((path) => (args) => {
-                        Quickshell.execDetached([path, ...(args ? args.split(" ") : [])]);
-                    })(FileUtils.trimFileProtocol(filePath.toString()))
+                    execute: (path => args => {
+                                Quickshell.execDetached([path, ...(args ? args.split(" ") : [])]);
+                            })(FileUtils.trimFileProtocol(filePath.toString()))
                 });
             }
         }
@@ -228,7 +228,7 @@ Singleton {
                         entry.execute();
                     else {
                         // Probably needs more proper escaping, but this will do for now
-                        Quickshell.execDetached(["bash", '-c', `${Config.options.apps.terminal} -e '${StringUtils.shellSingleQuoteEscape(entry.command.join(' '))}'`]);
+                        Quickshell.execDetached(["bash", '-c', `${Quickshell.env("TERMINAL")} -e '${StringUtils.shellSingleQuoteEscape(entry.command.join(' '))}'`]);
                     }
                 },
                 comment: entry.comment,
@@ -244,7 +244,7 @@ Singleton {
                             if (!action.runInTerminal)
                                 action.execute();
                             else {
-                                Quickshell.execDetached(["bash", '-c', `${Config.options.apps.terminal} -e '${StringUtils.shellSingleQuoteEscape(action.command.join(' '))}'`]);
+                                Quickshell.execDetached(["bash", '-c', `${Quickshell.env("TERMINAL")} -e '${StringUtils.shellSingleQuoteEscape(action.command.join(' '))}'`]);
                             }
                         }
                     });
@@ -264,7 +264,7 @@ Singleton {
                 if (cleanedCommand.startsWith(Config.options.search.prefix.shellCommand)) {
                     cleanedCommand = cleanedCommand.slice(Config.options.search.prefix.shellCommand.length);
                 }
-                Quickshell.execDetached(["bash", "-c", root.query.startsWith('sudo') ? `${Config.options.apps.terminal} fish -C '${cleanedCommand}'` : cleanedCommand]);
+                Quickshell.execDetached(["bash", "-c", root.query.startsWith('sudo') ? `${Quickshell.env("TERMINAL")} fish -C '${cleanedCommand}'` : cleanedCommand]);
             }
         });
         const webSearchResultObject = resultComp.createObject(null, {
