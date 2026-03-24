@@ -33,7 +33,7 @@ Scope {
 
             sourceComponent: RegionSelection {
                 screen: regionSelectorLoader.modelData
-                onDismiss: root.dismiss()
+                onRequestDismiss: root.dismiss()
                 action: root.action
                 selectionMode: root.selectionMode
             }
@@ -50,9 +50,28 @@ Scope {
         root.openWith(RegionSelection.SnipAction.Search,
             Config.options.regionSelector.circleSelection ? RegionSelection.SelectionMode.Circle : undefined)
     }
-    function ocr() { root.openWith(RegionSelection.SnipAction.CharRecognition) }
-    function record() { root.openWith(RegionSelection.SnipAction.Record) }
-    function recordWithSound() { root.openWith(RegionSelection.SnipAction.RecordWithSound) }
+
+    function ocr() {
+        root.action = RegionSelection.SnipAction.CharRecognition
+        root.selectionMode = RegionSelection.SelectionMode.RectCorners
+        GlobalStates.regionSelectorOpen = true
+    }
+
+    function record() {
+        root.action = RegionSelection.SnipAction.Record
+        root.selectionMode = RegionSelection.SelectionMode.RectCorners
+        // If already open then re-trigger to stop recording
+        if (GlobalStates.regionSelectorOpen) GlobalStates.regionSelectorOpen = false
+        GlobalStates.regionSelectorOpen = true
+    }
+
+    function recordWithSound() {
+        root.action = RegionSelection.SnipAction.RecordWithSound
+        root.selectionMode = RegionSelection.SelectionMode.RectCorners
+        // If already open then re-trigger to stop recording
+        if (GlobalStates.regionSelectorOpen) GlobalStates.regionSelectorOpen = false
+        GlobalStates.regionSelectorOpen = true
+    }
 
     IpcHandler {
         target: "region"

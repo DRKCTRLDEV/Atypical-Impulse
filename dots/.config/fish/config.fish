@@ -1,28 +1,25 @@
-function fish_prompt -d "Write out the prompt"
-    # This shows up as USER@HOST /home/user/ >, with the directory colored
-    # $USER and $hostname are set by fish, so you can just use them
-    # instead of using `whoami` and `hostname`
-    printf '%s@%s %s%s%s > ' $USER $hostname \
-        (set_color $fish_color_cwd) (prompt_pwd) (set_color normal)
-end
-
-if status is-interactive # Commands to run in interactive sessions can go here
-
+if status is-interactive
     # No greeting
     set fish_greeting
 
-    # No Starship inside IDEs
-    if test "$TERM_PROGRAM" != "vscode" -a "$TERM_PROGRAM" != "zed"
-        starship init fish | source
-    end
-
+    # Colors from quickshell theme
     if test -f ~/.local/state/quickshell/user/generated/terminal/sequences.txt
         cat ~/.local/state/quickshell/user/generated/terminal/sequences.txt
     end
 
-    alias ls 'eza --icons'
-    alias clear "printf '\033[2J\033[3J\033[1;1H'"
+    # Starship prompt (skip in vscode, zed, and linux VT)
+    if not contains -- $TERM_PROGRAM vscode zed; and test "$TERM" != linux
+        function starship_transient_prompt_func
+            starship module character
+        end
+        starship init fish | source
+    end
+
+    # Aliases
     alias cls 'clear'
     alias q 'qs -c ii'
 
+    if command -q eza
+        alias ls 'eza --icons'
+    end
 end
