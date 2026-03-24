@@ -17,7 +17,6 @@ Singleton {
             'battery': 'power',
             'power': 'power',
             'screenshot': 'screenshot_monitor',
-            'welcome': 'waving_hand',
             'time': 'scheduleb',
             'installed': 'download',
             'configuration reloaded': 'reset_wrench',
