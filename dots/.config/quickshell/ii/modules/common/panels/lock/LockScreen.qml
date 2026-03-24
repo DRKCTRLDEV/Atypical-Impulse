@@ -37,10 +37,10 @@ Scope {
     function unlockKeyring() {
         unlockKeyringProc.exec({
             environment: ({
-                "UNLOCK_PASSWORD": lockContext.currentText
-            }),
+                    "UNLOCK_PASSWORD": lockContext.currentText
+                }),
             command: ["bash", "-c", Quickshell.shellPath("scripts/keyring/unlock.sh")]
-        })
+        });
     }
 
     // This stores all the information shared between the lock surfaces on each screen.
@@ -58,7 +58,7 @@ Scope {
             }
         }
 
-        onUnlocked: (targetAction) => {
+        onUnlocked: targetAction => {
             // Perform the target action if it's not just unlocking
             if (targetAction == LockContext.ActionEnum.Poweroff) {
                 Session.poweroff();
@@ -69,14 +69,15 @@ Scope {
             }
 
             // Unlock the keyring if configured to do so
-            if (Config.options.lock.security.unlockKeyring) root.unlockKeyring(); // Async
+            if (Config.options.lock.security.unlockKeyring)
+                root.unlockKeyring(); // Async
 
             // Unlock the screen before exiting, or the compositor will display a
             // fallback lock you can't interact with.
             GlobalStates.screenLocked = false;
-            
+
             // Refocus last focused window on unlock (hack)
-            Quickshell.execDetached(["bash", "-c", `sleep 0.2; hyprctl --batch "dispatch togglespecialworkspace; dispatch togglespecialworkspace"`])
+            Quickshell.execDetached(["bash", "-c", `sleep 0.2; hyprctl --batch "dispatch togglespecialworkspace; dispatch togglespecialworkspace"`]);
 
             // Reset
             lockContext.reset();
@@ -119,14 +120,13 @@ Scope {
         description: "Locks the screen"
 
         onPressed: {
-            root.lock()
+            root.lock();
         }
     }
 
     GlobalShortcut {
         name: "lockFocus"
-        description: "Re-focuses the lock screen. This is because Hyprland after waking up for whatever reason"
-            + "decides to keyboard-unfocus the lock screen"
+        description: "Re-focuses the lock screen. This is because Hyprland after waking up for whatever reason" + "decides to keyboard-unfocus the lock screen"
 
         onPressed: {
             lockContext.shouldReFocus();
@@ -134,7 +134,8 @@ Scope {
     }
 
     function initIfReady() {
-        if (!Config.ready || !Persistent.ready) return;
+        if (!Config.ready || !Persistent.ready)
+            return;
         if (Config.options.lock.launchOnStartup && Persistent.isNewHyprlandInstance) {
             root.lock();
         } else {

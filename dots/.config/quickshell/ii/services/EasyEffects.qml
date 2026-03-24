@@ -1,10 +1,10 @@
+pragma Singleton
+pragma ComponentBehavior: Bound
 import qs.modules.common
 import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
-pragma Singleton
-pragma ComponentBehavior: Bound
 
 /**
  * Handles EasyEffects active state and presets.
@@ -16,28 +16,28 @@ Singleton {
     property bool active: false
 
     function fetchAvailability() {
-        fetchAvailabilityProc.running = true
+        fetchAvailabilityProc.running = true;
     }
 
     function fetchActiveState() {
-        fetchActiveStateProc.running = true
+        fetchActiveStateProc.running = true;
     }
 
     function disable() {
-        root.active = false
-        Quickshell.execDetached(["bash", "-c", "pkill easyeffects || flatpak pkill com.github.wwmm.easyeffects"])
+        root.active = false;
+        Quickshell.execDetached(["bash", "-c", "pkill easyeffects || flatpak pkill com.github.wwmm.easyeffects"]);
     }
 
     function enable() {
-        root.active = true
-        Quickshell.execDetached(["bash", "-c", "easyeffects --hide-window --service-mode || flatpak run com.github.wwmm.easyeffects --hide-window --service-mode"])
+        root.active = true;
+        Quickshell.execDetached(["bash", "-c", "easyeffects --hide-window --service-mode || flatpak run com.github.wwmm.easyeffects --hide-window --service-mode"]);
     }
 
     function toggle() {
         if (root.active) {
-            root.disable()
+            root.disable();
         } else {
-            root.enable()
+            root.enable();
         }
     }
 
@@ -46,7 +46,7 @@ Singleton {
         running: true
         command: ["bash", "-c", "command -v easyeffects || flatpak info com.github.wwmm.easyeffects > /dev/null 2>&1"]
         onExited: (exitCode, exitStatus) => {
-            root.available = exitCode === 0
+            root.available = exitCode === 0;
         }
     }
 
@@ -55,7 +55,7 @@ Singleton {
         running: true
         command: ["bash", "-c", "pidof easyeffects || flatpak ps | grep com.github.wwmm.easyeffects > /dev/null 2>&1"]
         onExited: (exitCode, exitStatus) => {
-            root.active = exitCode === 0
+            root.active = exitCode === 0;
         }
     }
 }

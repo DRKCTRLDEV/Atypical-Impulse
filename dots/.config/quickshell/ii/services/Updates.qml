@@ -15,14 +15,16 @@ Singleton {
     property bool available: false
     property alias checking: checkUpdatesProc.running
     property int count: 0
-    
+
     readonly property bool updateAdvised: available && count > Config.options.updates.adviseUpdateThreshold
     readonly property bool updateStronglyAdvised: available && count > Config.options.updates.stronglyAdviseUpdateThreshold
 
-    function load() {}
+    function load() {
+    }
     function refresh() {
-        if (!available) return;
-        print("[Updates] Checking for system updates")
+        if (!available)
+            return;
+        print("[Updates] Checking for system updates");
         checkUpdatesProc.running = true;
     }
 
@@ -31,7 +33,7 @@ Singleton {
         repeat: true
         running: Config.ready && Config.options.updates.check
         onTriggered: {
-            print("[Updates] Periodic update check due")
+            print("[Updates] Periodic update check due");
             root.refresh();
         }
     }

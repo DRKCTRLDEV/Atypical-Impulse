@@ -51,10 +51,7 @@ Item {
 
     Process {
         id: translateProc
-        command: ["bash", "-c", `trans -brief -no-bidi`
-            + ` -source '${StringUtils.shellSingleQuoteEscape(root.sourceLanguage)}'`
-            + ` -target '${StringUtils.shellSingleQuoteEscape(root.targetLanguage)}'`
-            + ` '${StringUtils.shellSingleQuoteEscape(root.inputTextArea.text.trim())}'`]
+        command: ["bash", "-c", `trans -brief -no-bidi` + ` -source '${StringUtils.shellSingleQuoteEscape(root.sourceLanguage)}'` + ` -target '${StringUtils.shellSingleQuoteEscape(root.targetLanguage)}'` + ` '${StringUtils.shellSingleQuoteEscape(root.inputTextArea.text.trim())}'`]
         property string buffer: ""
         stdout: SplitParser {
             onRead: data => {
@@ -150,7 +147,8 @@ Item {
             }
 
             onActionTriggered: action => {
-                if (!root.inputTextArea) return;
+                if (!root.inputTextArea)
+                    return;
                 if (action === "paste") {
                     root.inputTextArea.text = Quickshell.clipboardText;
                 } else if (action === "delete") {

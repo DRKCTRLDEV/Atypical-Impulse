@@ -15,7 +15,7 @@ import Quickshell
  */
 Singleton {
     id: root
-    
+
     readonly property var renderPadding: 4 // This is to prevent cutoff in the rendered images
 
     property list<string> processedHashes: []
@@ -33,17 +33,17 @@ Singleton {
     */
     function requestRender(expression) {
         // 1. Hash it and initialize necessary variables
-        const hash = Qt.md5(expression)
-        const imagePath = `${latexOutputPath}/${hash}.svg`
-        
+        const hash = Qt.md5(expression);
+        const imagePath = `${latexOutputPath}/${hash}.svg`;
+
         // 2. Check if the hash is already processed
         if (processedHashes.includes(hash)) {
             // console.log("Already processed: " + hash)
-            renderFinished(hash, imagePath)
-            return [hash, false]
+            renderFinished(hash, imagePath);
+            return [hash, false];
         } else {
-            root.processedHashes.push(hash)
-            root.processedExpressions[hash] = expression
+            root.processedHashes.push(hash);
+            root.processedExpressions[hash] = expression;
             // console.log("Rendering expression: " + expression)
         }
 
@@ -56,9 +56,9 @@ Singleton {
             Process {
                 id: microtexProcess${hash}
                 running: true
-                command: [ "bash", "-c", 
+                command: [ "bash", "-c",
                     "cd ${root.microtexBinaryDir} && ./${root.microtexBinaryName} -headless '-input=${StringUtils.shellSingleQuoteEscape(StringUtils.escapeBackslashes(expression))}' "
-                    + "'-output=${imagePath}' " 
+                    + "'-output=${imagePath}' "
                     + "'-textsize=${Appearance.font.pixelSize.normal}' "
                     + "'-padding=${renderPadding}' "
                     // + "'-background=${Appearance.m3colors.m3tertiary}' "
@@ -75,9 +75,9 @@ Singleton {
                     microtexProcess${hash}.destroy()
                 }
             }
-        `
+        `;
         // console.log("MicroTeX: " + processQml)
-        Qt.createQmlObject(processQml, root, `MicroTeXProcess_${hash}`)
-        return [hash, true]
+        Qt.createQmlObject(processQml, root, `MicroTeXProcess_${hash}`);
+        return [hash, true];
     }
 }

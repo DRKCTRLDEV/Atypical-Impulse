@@ -16,8 +16,18 @@ OverlayWindow {
     id: root
     wlrNamespace: "quickshell:regionSelector"
 
-    enum SnipAction { Copy, Edit, Search, CharRecognition, Record, RecordWithSound } 
-    enum SelectionMode { RectCorners, Circle }
+    enum SnipAction {
+        Copy,
+        Edit,
+        Search,
+        CharRecognition,
+        Record,
+        RecordWithSound
+    }
+    enum SelectionMode {
+        RectCorners,
+        Circle
+    }
     property var action: RegionSelection.SnipAction.Copy
     property var selectionMode: RegionSelection.SelectionMode.RectCorners
 
@@ -31,7 +41,8 @@ OverlayWindow {
     property color imageFillColor: ColorUtils.transparentize(imageBorderColor, 0.85)
     readonly property var windows: [...HyprlandData.windowList].sort((a, b) => {
         // Sort floating=true windows before others
-        if (a.floating === b.floating) return 0;
+        if (a.floating === b.floating)
+            return 0;
         return a.floating ? -1 : 1;
     })
     readonly property var layers: HyprlandData.layers
@@ -51,27 +62,23 @@ OverlayWindow {
     property list<point> points: []
     property var mouseButton: null
     property var imageRegions: []
-    readonly property list<var> windowRegions: RegionFunctions.filterWindowRegionsByLayers(
-        root.windows.filter(w => w.workspace.id === root.activeWorkspaceId),
-        root.layerRegions
-    ).map(window => {
+    readonly property list<var> windowRegions: RegionFunctions.filterWindowRegionsByLayers(root.windows.filter(w => w.workspace.id === root.activeWorkspaceId), root.layerRegions).map(window => {
         return {
             at: [window.at[0] - root.monitorOffsetX, window.at[1] - root.monitorOffsetY],
             size: [window.size[0], window.size[1]],
             class: window.class,
-            title: window.title,
-        }
+            title: window.title
+        };
     })
     readonly property list<var> layerRegions: {
         const topLayers = root.layers[root.hyprlandMonitor.name]?.levels["2"];
-        if (!topLayers) return [];
-        return topLayers
-            .filter(layer => !(layer.namespace.includes(":bar") || layer.namespace.includes(":verticalBar") || layer.namespace.includes(":dock")))
-            .map(layer => ({
-                at: [layer.x - root.monitorOffsetX, layer.y - root.monitorOffsetY],
-                size: [layer.w, layer.h],
-                namespace: layer.namespace,
-            }));
+        if (!topLayers)
+            return [];
+        return topLayers.filter(layer => !(layer.namespace.includes(":bar") || layer.namespace.includes(":verticalBar") || layer.namespace.includes(":dock"))).map(layer => ({
+                    at: [layer.x - root.monitorOffsetX, layer.y - root.monitorOffsetY],
+                    size: [layer.w, layer.h],
+                    namespace: layer.namespace
+                }));
     }
 
     property bool isCircleSelection: (root.selectionMode === RegionSelection.SelectionMode.Circle)
@@ -86,12 +93,10 @@ OverlayWindow {
     property real targetedRegionWidth: 0
     property real targetedRegionHeight: 0
     function targetedRegionValid() {
-        return (root.targetedRegionX >= 0 && root.targetedRegionY >= 0)
+        return (root.targetedRegionX >= 0 && root.targetedRegionY >= 0);
     }
     function isTargeted(modelData) {
-        return !root.draggedAway
-            && root.targetedRegionX === modelData.at[0] && root.targetedRegionY === modelData.at[1]
-            && root.targetedRegionWidth === modelData.size[0] && root.targetedRegionHeight === modelData.size[1];
+        return !root.draggedAway && root.targetedRegionX === modelData.at[0] && root.targetedRegionY === modelData.at[1] && root.targetedRegionWidth === modelData.size[0] && root.targetedRegionHeight === modelData.size[1];
     }
     function setRegionToTargeted() {
         const padding = Config.options.regionSelector.targetRegions.selectionPadding; // Make borders not cut off n stuff
@@ -102,8 +107,7 @@ OverlayWindow {
     }
 
     function updateTargetedRegion(x, y) {
-        const hit = [...root.imageRegions, ...root.layerRegions, ...root.windowRegions]
-            .find(r => r.at[0] <= x && x <= r.at[0] + r.size[0] && r.at[1] <= y && y <= r.at[1] + r.size[1]);
+        const hit = [...root.imageRegions, ...root.layerRegions, ...root.windowRegions].find(r => r.at[0] <= x && x <= r.at[0] + r.size[0] && r.at[1] <= y && y <= r.at[1] + r.size[1]);
         root.targetedRegionX = hit?.at[0] ?? -1;
         root.targetedRegionY = hit?.at[1] ?? -1;
         root.targetedRegionWidth = hit?.size[0] ?? 0;
@@ -116,7 +120,8 @@ OverlayWindow {
     property real regionY: Math.min(dragStartY, draggingY)
 
     onScreenshotFinished: (exitCode, exitStatus) => {
-        if (root.enableContentRegions) imageDetectionProcess.running = true;
+        if (root.enableContentRegions)
+            imageDetectionProcess.running = true;
         root.preparationDone = !checkRecordingProc.running;
     }
     property bool isRecording: root.action === RegionSelection.SnipAction.Record || root.action === RegionSelection.SnipAction.RecordWithSound
@@ -126,13 +131,14 @@ OverlayWindow {
         running: isRecording
         command: ["pidof", "wf-recorder"]
         onExited: (exitCode, exitStatus) => {
-            root.preparationDone = !root.screenshotProcess.running
+            root.preparationDone = !root.screenshotProcess.running;
             root.recordingShouldStop = (exitCode === 0);
         }
     }
     property bool preparationDone: false
     onPreparationDoneChanged: {
-        if (!preparationDone) return;
+        if (!preparationDone)
+            return;
         if (root.isRecording && root.recordingShouldStop) {
             Quickshell.execDetached([Directories.recordScriptPath]);
             root.dismiss();
@@ -143,18 +149,11 @@ OverlayWindow {
 
     Process {
         id: imageDetectionProcess
-        command: ["bash", "-c", `${Directories.scriptPath}/images/find-regions-venv.sh ` 
-            + `--hyprctl ` 
-            + `--image '${StringUtils.shellSingleQuoteEscape(root.screenshotPath)}' ` 
-            + `--max-width ${Math.round(root.screen.width * root.falsePositivePreventionRatio)} ` 
-            + `--max-height ${Math.round(root.screen.height * root.falsePositivePreventionRatio)} `]
+        command: ["bash", "-c", `${Directories.scriptPath}/images/find-regions-venv.sh ` + `--hyprctl ` + `--image '${StringUtils.shellSingleQuoteEscape(root.screenshotPath)}' ` + `--max-width ${Math.round(root.screen.width * root.falsePositivePreventionRatio)} ` + `--max-height ${Math.round(root.screen.height * root.falsePositivePreventionRatio)} `]
         stdout: StdioCollector {
             id: imageDimensionCollector
             onStreamFinished: {
-                imageRegions = RegionFunctions.filterImageRegions(
-                    JSON.parse(imageDimensionCollector.text),
-                    root.windowRegions
-                );
+                imageRegions = RegionFunctions.filterImageRegions(JSON.parse(imageDimensionCollector.text), root.windowRegions);
             }
         }
     }
@@ -176,12 +175,7 @@ OverlayWindow {
         }
         // SnipAction ordinals match ScreenshotAction.Action 1:1
         const s = root.monitorScale;
-        snipProc.command = ScreenshotAction.getCommand(
-            root.regionX * s, root.regionY * s,
-            root.regionWidth * s, root.regionHeight * s,
-            root.screenshotPath, root.action,
-            Config.options.screenSnip.savePath
-        );
+        snipProc.command = ScreenshotAction.getCommand(root.regionX * s, root.regionY * s, root.regionWidth * s, root.regionHeight * s, root.screenshotPath, root.action, Config.options.screenSnip.savePath);
         snipProc.startDetached();
         root.dismiss();
     }
@@ -196,7 +190,7 @@ OverlayWindow {
         captureSource: root.screen
 
         focus: root.visible
-        Keys.onPressed: (event) => { // Esc to close
+        Keys.onPressed: event => { // Esc to close
             if (event.key === Qt.Key_Escape) {
                 root.dismiss();
             }
@@ -210,7 +204,7 @@ OverlayWindow {
             hoverEnabled: true
 
             // Controls
-            onPressed: (mouse) => {
+            onPressed: mouse => {
                 root.dragStartX = mouse.x;
                 root.dragStartY = mouse.y;
                 root.draggingX = mouse.x;
@@ -218,17 +212,22 @@ OverlayWindow {
                 root.dragging = true;
                 root.mouseButton = mouse.button;
             }
-            onReleased: (mouse) => {
+            onReleased: mouse => {
                 // Detect if it was a click -> Try to select targeted region
                 if (root.draggingX === root.dragStartX && root.draggingY === root.dragStartY) {
                     if (root.targetedRegionValid()) {
                         root.setRegionToTargeted();
                     }
-                }
+                } else
                 // Circle dragging?
-                else if (root.selectionMode === RegionSelection.SelectionMode.Circle) {
+                if (root.selectionMode === RegionSelection.SelectionMode.Circle) {
                     const padding = Config.options.regionSelector.circle.padding + Config.options.regionSelector.circle.strokeWidth / 2;
-                    const dragPoints = (root.points.length > 0) ? root.points : [{ x: mouseArea.mouseX, y: mouseArea.mouseY }];
+                    const dragPoints = (root.points.length > 0) ? root.points : [
+                        {
+                            x: mouseArea.mouseX,
+                            y: mouseArea.mouseY
+                        }
+                    ];
                     const maxX = Math.max(...dragPoints.map(p => p.x));
                     const minX = Math.min(...dragPoints.map(p => p.x));
                     const maxY = Math.max(...dragPoints.map(p => p.y));
@@ -240,16 +239,20 @@ OverlayWindow {
                 }
                 root.snip();
             }
-            onPositionChanged: (mouse) => {
+            onPositionChanged: mouse => {
                 root.updateTargetedRegion(mouse.x, mouse.y);
-                if (!root.dragging) return;
+                if (!root.dragging)
+                    return;
                 root.draggingX = mouse.x;
                 root.draggingY = mouse.y;
                 root.dragDiffX = mouse.x - root.dragStartX;
                 root.dragDiffY = mouse.y - root.dragStartY;
-                root.points.push({ x: mouse.x, y: mouse.y });
+                root.points.push({
+                    x: mouse.x,
+                    y: mouse.y
+                });
             }
-            
+
             Loader {
                 z: 2
                 anchors.fill: parent
@@ -352,7 +355,6 @@ OverlayWindow {
                     }
                 }
             }
-            
         }
     }
 }

@@ -13,7 +13,7 @@ import Quickshell.Hyprland
  */
 Singleton {
     id: root
-    property string from: Config.options?.light?.night?.from ?? "19:00" 
+    property string from: Config.options?.light?.night?.from ?? "19:00"
     property string to: Config.options?.light?.night?.to ?? "06:30"
     property bool automatic: Config.options?.light?.night?.automatic && (Config?.ready ?? true)
     property int colorTemperature: Config.options?.light?.night?.colorTemperature ?? 5000
@@ -77,7 +77,8 @@ Singleton {
         }
     }
 
-    function load() { } // Dummy to force init
+    function load() {
+    } // Dummy to force init
 
     function enable() {
         root.active = true;
@@ -131,7 +132,8 @@ Singleton {
     Connections {
         target: Config.options.light.night
         function onColorTemperatureChanged() {
-            if (!root.active) return;
+            if (!root.active)
+                return;
             Quickshell.execDetached(["hyprctl", "hyprsunset", "temperature", `${Config.options.light.night.colorTemperature}`]);
         }
     }

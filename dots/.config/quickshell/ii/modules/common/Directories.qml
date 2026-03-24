@@ -30,9 +30,9 @@ Singleton {
     property string shellConfig: FileUtils.trimFileProtocol(`${Directories.config}/illogical-impulse`)
     property string shellConfigName: "config.json"
     property string shellConfigPath: `${Directories.shellConfig}/${Directories.shellConfigName}`
-	property string todoPath: FileUtils.trimFileProtocol(`${Directories.state}/user/todo.json`)
-	property string notesPath: FileUtils.trimFileProtocol(`${Directories.state}/user/notes.txt`)
-	property string conflictCachePath: FileUtils.trimFileProtocol(`${Directories.cache}/conflict-killer`)
+    property string todoPath: FileUtils.trimFileProtocol(`${Directories.state}/user/todo.json`)
+    property string notesPath: FileUtils.trimFileProtocol(`${Directories.state}/user/notes.txt`)
+    property string conflictCachePath: FileUtils.trimFileProtocol(`${Directories.cache}/conflict-killer`)
     property string notificationsPath: FileUtils.trimFileProtocol(`${Directories.cache}/notifications/notifications.json`)
     property string generatedMaterialThemePath: FileUtils.trimFileProtocol(`${Directories.state}/user/generated/colors.json`)
     property string generatedWallpaperCategoryPath: FileUtils.trimFileProtocol(`${Directories.state}/user/generated/wallpaper/category.txt`)
@@ -47,13 +47,13 @@ Singleton {
     property string userAvatarPathRicersAndWeirdSystems2: FileUtils.trimFileProtocol(`${Directories.home}.face.icon`)
     // Cleanup on init
     Component.onCompleted: {
-        Quickshell.execDetached(["mkdir", "-p", `${shellConfig}`])
-        Quickshell.execDetached(["mkdir", "-p", `${favicons}`])
-        Quickshell.execDetached(["bash", "-c", `rm -rf '${coverArt}'; mkdir -p '${coverArt}'`])
-        Quickshell.execDetached(["bash", "-c", `rm -rf '${latexOutput}'; mkdir -p '${latexOutput}'`])
-        Quickshell.execDetached(["bash", "-c", `rm -rf '${cliphistDecode}'; mkdir -p '${cliphistDecode}'`])
-        Quickshell.execDetached(["mkdir", "-p", `${userActions}`])
-        Quickshell.execDetached(["rm", "-rf", `${tempImages}`])
-        Quickshell.execDetached(["bash", "-c", `mkdir -p '${cavaConfigDir}'; pactl list short modules 2>/dev/null | grep 'qs-cava-' | awk '{print $1}' | xargs -r -n1 pactl unload-module`])
+        Quickshell.execDetached(["mkdir", "-p", `${shellConfig}`]);
+        Quickshell.execDetached(["mkdir", "-p", `${favicons}`]);
+        Quickshell.execDetached(["bash", "-c", `rm -rf '${coverArt}'; mkdir -p '${coverArt}'`]);
+        Quickshell.execDetached(["bash", "-c", `rm -rf '${latexOutput}'; mkdir -p '${latexOutput}'`]);
+        Quickshell.execDetached(["bash", "-c", `rm -rf '${cliphistDecode}'; mkdir -p '${cliphistDecode}'`]);
+        Quickshell.execDetached(["mkdir", "-p", `${userActions}`]);
+        Quickshell.execDetached(["rm", "-rf", `${tempImages}`]);
+        Quickshell.execDetached(["bash", "-c", `mkdir -p '${cavaConfigDir}'; pactl list short modules 2>/dev/null | grep 'qs-cava-' | awk '{print $1}' | xargs -r -n1 pactl unload-module`]);
     }
 }

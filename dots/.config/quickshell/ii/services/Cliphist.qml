@@ -17,38 +17,36 @@ Singleton {
     property real scoreThreshold: 0.2
     property list<string> entries: []
     readonly property var preparedEntries: entries.map(a => ({
-        name: Fuzzy.prepare(`${a.replace(/^\s*\S+\s+/, "")}`),
-        entry: a
-    }))
+                name: Fuzzy.prepare(`${a.replace(/^\s*\S+\s+/, "")}`),
+                entry: a
+            }))
     function fuzzyQuery(search: string): var {
         if (search.trim() === "") {
             return entries;
         }
         if (root.sloppySearch) {
             const results = entries.slice(0, 100).map(str => ({
-                entry: str,
-                score: Levendist.computeTextMatchScore(str.toLowerCase(), search.toLowerCase())
-            })).filter(item => item.score > root.scoreThreshold)
-                .sort((a, b) => b.score - a.score)
-            return results
-                .map(item => item.entry)
+                        entry: str,
+                        score: Levendist.computeTextMatchScore(str.toLowerCase(), search.toLowerCase())
+                    })).filter(item => item.score > root.scoreThreshold).sort((a, b) => b.score - a.score);
+            return results.map(item => item.entry);
         }
 
         return Fuzzy.go(search, preparedEntries, {
             all: true,
             key: "name"
         }).map(r => {
-            return r.obj.entry
+            return r.obj.entry;
         });
     }
 
     function entryIsImage(entry) {
-        return !!(/^\d+\t\[\[.*binary data.*\d+x\d+.*\]\]$/.test(entry))
+        return !!(/^\d+\t\[\[.*binary data.*\d+x\d+.*\]\]$/.test(entry));
     }
 
     function refresh() {
-        readProc.buffer = []
-        readProc.running = true
+        readProc.buffer = [];
+        readProc.running = true;
     }
 
     function copy(entry) {
@@ -72,10 +70,11 @@ Singleton {
     function superpaste(count, isImage = false) {
         // Find entries
         const targetEntries = entries.filter(entry => {
-            if (!isImage) return true;
+            if (!isImage)
+                return true;
             return entryIsImage(entry);
-        }).slice(0, count)
-        const pasteCommands = [...targetEntries].reverse().map(entry => `printf '${StringUtils.shellSingleQuoteEscape(entry)}' | ${root.cliphistBinary} decode | wl-copy && sleep ${root.pasteDelay} && ${root.pressPasteCommand}`)
+        }).slice(0, count);
+        const pasteCommands = [...targetEntries].reverse().map(entry => `printf '${StringUtils.shellSingleQuoteEscape(entry)}' | ${root.cliphistBinary} decode | wl-copy && sleep ${root.pasteDelay} && ${root.pressPasteCommand}`);
         // Act
         Quickshell.execDetached(["bash", "-c", pasteCommands.join(` && sleep ${root.pasteDelay} && `)]);
     }
@@ -113,7 +112,7 @@ Singleton {
     Connections {
         target: Quickshell
         function onClipboardTextChanged() {
-            delayedUpdateTimer.restart()
+            delayedUpdateTimer.restart();
         }
     }
 
@@ -122,7 +121,7 @@ Singleton {
         interval: Config.options.hacks.arbitraryRaceConditionDelay
         repeat: false
         onTriggered: {
-            root.refresh()
+            root.refresh();
         }
     }
 
@@ -133,16 +132,16 @@ Singleton {
         command: [root.cliphistBinary, "list"]
 
         stdout: SplitParser {
-            onRead: (line) => {
-                readProc.buffer.push(line)
+            onRead: line => {
+                readProc.buffer.push(line);
             }
         }
 
         onExited: (exitCode, exitStatus) => {
             if (exitCode === 0) {
-                root.entries = readProc.buffer
+                root.entries = readProc.buffer;
             } else {
-                console.error("[Cliphist] Failed to refresh with code", exitCode, "and status", exitStatus)
+                console.error("[Cliphist] Failed to refresh with code", exitCode, "and status", exitStatus);
             }
         }
     }
@@ -151,7 +150,7 @@ Singleton {
         target: "cliphistService"
 
         function update(): void {
-            root.refresh()
+            root.refresh();
         }
     }
 }

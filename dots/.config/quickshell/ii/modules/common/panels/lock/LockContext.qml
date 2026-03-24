@@ -8,11 +8,15 @@ import Quickshell.Services.Pam
 Scope {
     id: root
 
-    enum ActionEnum { Unlock, Poweroff, Reboot }
+    enum ActionEnum {
+        Unlock,
+        Poweroff,
+        Reboot
+    }
 
-    signal shouldReFocus()
+    signal shouldReFocus
     signal unlocked(targetAction: var)
-    signal failed()
+    signal failed
 
     // These properties are in the context and not individual lock surfaces
     // so all surfaces can share the same state.
@@ -94,7 +98,7 @@ Scope {
             }
         }
     }
-    
+
     PamContext {
         id: pam
 
@@ -130,7 +134,7 @@ Scope {
                 root.unlocked(root.targetAction);
                 stopFingerPam();
             } else if (result == PamResult.Error) { // if timeout or etc..
-                tryFingerUnlock()
+                tryFingerUnlock();
             }
         }
     }

@@ -4,9 +4,9 @@ pragma ComponentBehavior: Bound
 import qs
 import qs.modules.common
 import qs.modules.common.functions
-import Quickshell;
-import Quickshell.Io;
-import QtQuick;
+import Quickshell
+import Quickshell.Io
+import QtQuick
 
 /**
  * For storing sensitive data in the keyring.
@@ -17,20 +17,19 @@ Singleton {
 
     property bool loaded: false
     property var keyringData: ({})
-    
+
     property var properties: {
         "application": "illogical-impulse",
-        "explanation": Translation.tr("For storing API keys and other sensitive information"),
+        "explanation": Translation.tr("For storing API keys and other sensitive information")
     }
-    property var propertiesAsArgs: Object.keys(root.properties).reduce(
-        function(arr, key) {
-            return arr.concat([key, root.properties[key]]);
-        }, []
-    )
+    property var propertiesAsArgs: Object.keys(root.properties).reduce(function (arr, key) {
+        return arr.concat([key, root.properties[key]]);
+    }, [])
     property string keyringLabel: Translation.tr("%1 Safe Storage").arg("illogical-impulse")
 
     function setNestedField(path, value) {
-        if (!root.keyringData) root.keyringData = {};
+        if (!root.keyringData)
+            root.keyringData = {};
         let keys = path;
         let obj = root.keyringData;
         let parents = [obj];
@@ -74,15 +73,12 @@ Singleton {
 
     Process {
         id: saveData
-        command: [
-            "secret-tool", "store", "--label=" + keyringLabel,
-            ...propertiesAsArgs,
-        ]
+        command: ["secret-tool", "store", "--label=" + keyringLabel, ...propertiesAsArgs,]
         onRunningChanged: {
             if (saveData.running) {
                 // console.log("[KeyringStorage] Saving with command: '" + saveData.command.join("' '") + "'");
                 saveData.write(JSON.stringify(root.keyringData));
-                stdinEnabled = false // End input stream
+                stdinEnabled = false; // End input stream
             }
         }
     }
@@ -90,20 +86,20 @@ Singleton {
     Process {
         id: getData
         command: [ // We need to use echo for a newline so splitparser does parse
-            "bash", "-c", `${Directories.scriptPath}/keyring/try_lookup.sh 2> /dev/null`,
-        ]
+            "bash", "-c", `${Directories.scriptPath}/keyring/try_lookup.sh 2> /dev/null`,]
         stdout: StdioCollector {
             id: keyringDataOutputCollector
             onStreamFinished: {
                 const data = keyringDataOutputCollector.text;
-                if (data.length === 0 || !data.startsWith("{")) return;
+                if (data.length === 0 || !data.startsWith("{"))
+                    return;
                 try {
                     root.keyringData = JSON.parse(data);
                     // console.log("[KeyringStorage] Keyring data fetched:", JSON.stringify(root.keyringData));
                 } catch (e) {
                     console.error("[KeyringStorage] Failed to get keyring data, reinitializing.");
                     root.keyringData = {};
-                    saveKeyringData()
+                    saveKeyringData();
                 }
             }
         }
@@ -112,12 +108,11 @@ Singleton {
             if (exitCode === 1) {
                 console.error("[KeyringStorage] Entry not found, initializing.");
                 root.keyringData = {};
-                saveKeyringData()
+                saveKeyringData();
             }
             if (exitCode !== 2) {
                 root.loaded = true;
             }
         }
     }
-    
 }

@@ -52,7 +52,7 @@ StyledOverlayWidget {
                         Quickshell.execDetached(["qs", "-p", Quickshell.shellPath(""), "ipc", "call", "region", "recordWithSound"]);
                     }
                 }
-                
+
                 BigRecorderButton {
                     materialSymbol: "capture"
                     name: "Record screen"
