@@ -49,3 +49,8 @@ output_path = '~/.config/micro/colorschemes/matugen.micro'
 [templates.zed]
 input_path = '~/.config/matugen/templates/zed/zed-colors.json'
 output_path = '~/.config/zed/themes/matugen.json'
+
+[templates.btop]
+input_path = '~/.config/matugen/templates/btop/btop.theme'
+output_path = '~/.config/btop/themes/matugen.theme'
+post_hook = 'pkill -USR2 btop || true'
