@@ -7,49 +7,63 @@ Item {
     id: root
     property var action
     property var selectionMode
+    property string displayText: ""
 
-    property string description: switch (root.action) {
-    case RegionSelection.SnipAction.Copy:
-    case RegionSelection.SnipAction.Edit:
-        return Translation.tr("Copy region (LMB) or annotate (RMB)");
-    case RegionSelection.SnipAction.Search:
-        return Translation.tr("Image Search");
-    case RegionSelection.SnipAction.CharRecognition:
-        return Translation.tr("Recognize text");
-    case RegionSelection.SnipAction.Record:
-    case RegionSelection.SnipAction.RecordWithSound:
-        return Translation.tr("Record region");
+    readonly property bool hasDisplayText: root.displayText !== ""
+
+    readonly property var actionMetadata: ({
+            [RegionSelection.SnipAction.Copy]: {
+                description: Translation.tr("Copy region (LMB) or annotate (RMB)"),
+                icon: "content_cut"
+            },
+            [RegionSelection.SnipAction.Edit]: {
+                description: Translation.tr("Copy region (LMB) or annotate (RMB)"),
+                icon: "content_cut"
+            },
+            [RegionSelection.SnipAction.Search]: {
+                description: Translation.tr("Image Search"),
+                icon: "image_search"
+            },
+            [RegionSelection.SnipAction.CharRecognition]: {
+                description: Translation.tr("Recognize text"),
+                icon: "document_scanner"
+            },
+            [RegionSelection.SnipAction.Record]: {
+                description: Translation.tr("Record region"),
+                icon: "videocam"
+            },
+            [RegionSelection.SnipAction.RecordWithSound]: {
+                description: Translation.tr("Record region"),
+                icon: "videocam"
+            }
+        })
+
+    property string description: {
+        if (root.hasDisplayText)
+            return "";
+        return root.actionMetadata[root.action]?.description ?? "";
     }
-    property string materialSymbol: switch (root.action) {
-    case RegionSelection.SnipAction.Copy:
-    case RegionSelection.SnipAction.Edit:
-        return "content_cut";
-    case RegionSelection.SnipAction.Search:
-        return "image_search";
-    case RegionSelection.SnipAction.CharRecognition:
-        return "document_scanner";
-    case RegionSelection.SnipAction.Record:
-    case RegionSelection.SnipAction.RecordWithSound:
-        return "videocam";
-    default:
-        return "";
+    property string materialSymbol: {
+        if (root.hasDisplayText)
+            return "";
+        return root.actionMetadata[root.action]?.icon ?? "";
     }
 
     property bool showDescription: true
     function hideDescription() {
-        root.showDescription = false
+        root.showDescription = false;
     }
     Timer {
         id: descTimeout
         interval: 1000
-        running: true
+        running: !root.hasDisplayText
         onTriggered: {
-            root.hideDescription()
+            root.hideDescription();
         }
     }
     onActionChanged: {
-        root.showDescription = true
-        descTimeout.restart()
+        root.showDescription = true;
+        descTimeout.restart();
     }
 
     property int margins: 8
@@ -62,7 +76,11 @@ Item {
 
         property real padding: 8
         implicitHeight: 38
-        implicitWidth: root.showDescription ? contentRow.implicitWidth + padding * 2 : implicitHeight
+        implicitWidth: {
+            if (root.hasDisplayText)
+                return displayTextItem.implicitWidth + padding * 2;
+            return root.showDescription ? contentRow.implicitWidth + padding * 2 : implicitHeight;
+        }
         clip: true
 
         topLeftRadius: 6
@@ -79,8 +97,18 @@ Item {
             animation: Appearance.animation.elementMove.numberAnimation.createObject(this)
         }
 
+        StyledText {
+            id: displayTextItem
+            visible: root.hasDisplayText
+            anchors.centerIn: parent
+            color: Appearance.colors.colOnPrimary
+            font.family: Appearance.font.family.monospace
+            text: root.displayText
+        }
+
         Row {
             id: contentRow
+            visible: !root.hasDisplayText
             anchors {
                 verticalCenter: parent.verticalCenter
                 left: parent.left

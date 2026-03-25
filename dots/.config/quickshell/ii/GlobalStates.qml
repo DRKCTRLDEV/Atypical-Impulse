@@ -1,11 +1,11 @@
+pragma Singleton
+pragma ComponentBehavior: Bound
 import qs.modules.common
 import qs.services
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
-pragma Singleton
-pragma ComponentBehavior: Bound
 
 Singleton {
     id: root
@@ -20,7 +20,6 @@ Singleton {
     property bool overlayOpen: false
     property bool overviewOpen: false
     property bool regionSelectorOpen: false
-    property bool screenRulerOpen: false
     property bool searchOpen: false
     property bool screenLocked: false
     property bool screenLockContainsCharacters: false
@@ -43,10 +42,10 @@ Singleton {
         description: "Hold to show workspace numbers, release to show icons"
 
         onPressed: {
-            root.superDown = true
+            root.superDown = true;
         }
         onReleased: {
-            root.superDown = false
+            root.superDown = false;
         }
     }
 }

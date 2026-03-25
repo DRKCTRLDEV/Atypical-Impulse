@@ -18,12 +18,13 @@ Scope {
     id: root
 
     function dismiss() {
-        GlobalStates.regionSelectorOpen = false
+        GlobalStates.regionSelectorOpen = false;
     }
 
     property var action: RegionSelection.SnipAction.Copy
     property var selectionMode: RegionSelection.SelectionMode.RectCorners
-    
+    property var rulerMode: null
+
     Variants {
         model: Quickshell.screens
         delegate: Loader {
@@ -36,50 +37,80 @@ Scope {
                 onRequestDismiss: root.dismiss()
                 action: root.action
                 selectionMode: root.selectionMode
+                rulerMode: root.rulerMode
             }
         }
     }
 
     function openWith(action, mode) {
+        root.rulerMode = null;
         root.action = action;
         root.selectionMode = mode ?? RegionSelection.SelectionMode.RectCorners;
         GlobalStates.regionSelectorOpen = true;
     }
-    function screenshot() { root.openWith(RegionSelection.SnipAction.Copy) }
+    function openRuler(mode) {
+        root.rulerMode = mode ?? RegionSelection.RulerMode.Crosshair;
+        GlobalStates.regionSelectorOpen = true;
+    }
+    function screenshot() {
+        root.openWith(RegionSelection.SnipAction.Copy);
+    }
     function search() {
-        root.openWith(RegionSelection.SnipAction.Search,
-            Config.options.regionSelector.circleSelection ? RegionSelection.SelectionMode.Circle : undefined)
+        root.openWith(RegionSelection.SnipAction.Search, Config.options.regionSelector.circleSelection ? RegionSelection.SelectionMode.Circle : undefined);
     }
 
     function ocr() {
-        root.action = RegionSelection.SnipAction.CharRecognition
-        root.selectionMode = RegionSelection.SelectionMode.RectCorners
-        GlobalStates.regionSelectorOpen = true
+        root.openWith(RegionSelection.SnipAction.CharRecognition);
     }
 
+    function _toggleRecord(action) {
+        root.rulerMode = null;
+        root.action = action;
+        root.selectionMode = RegionSelection.SelectionMode.RectCorners;
+        if (GlobalStates.regionSelectorOpen)
+            GlobalStates.regionSelectorOpen = false;
+        GlobalStates.regionSelectorOpen = true;
+    }
     function record() {
-        root.action = RegionSelection.SnipAction.Record
-        root.selectionMode = RegionSelection.SelectionMode.RectCorners
-        // If already open then re-trigger to stop recording
-        if (GlobalStates.regionSelectorOpen) GlobalStates.regionSelectorOpen = false
-        GlobalStates.regionSelectorOpen = true
+        root._toggleRecord(RegionSelection.SnipAction.Record);
     }
-
     function recordWithSound() {
-        root.action = RegionSelection.SnipAction.RecordWithSound
-        root.selectionMode = RegionSelection.SelectionMode.RectCorners
-        // If already open then re-trigger to stop recording
-        if (GlobalStates.regionSelectorOpen) GlobalStates.regionSelectorOpen = false
-        GlobalStates.regionSelectorOpen = true
+        root._toggleRecord(RegionSelection.SnipAction.RecordWithSound);
     }
 
     IpcHandler {
         target: "region"
-        function screenshot() { root.screenshot() }
-        function search() { root.search() }
-        function ocr() { root.ocr() }
-        function record() { root.record() }
-        function recordWithSound() { root.recordWithSound() }
+        function screenshot() {
+            root.screenshot();
+        }
+        function search() {
+            root.search();
+        }
+        function ocr() {
+            root.ocr();
+        }
+        function record() {
+            root.record();
+        }
+        function recordWithSound() {
+            root.recordWithSound();
+        }
+    }
+
+    IpcHandler {
+        target: "ruler"
+        function open() {
+            root.openRuler();
+        }
+        function crosshair() {
+            root.openRuler(RegionSelection.RulerMode.Crosshair);
+        }
+        function horizontal() {
+            root.openRuler(RegionSelection.RulerMode.Horizontal);
+        }
+        function vertical() {
+            root.openRuler(RegionSelection.RulerMode.Vertical);
+        }
     }
 
     GlobalShortcut {
@@ -106,5 +137,10 @@ Scope {
         name: "regionRecordWithSound"
         description: "Records the selected region with sound"
         onPressed: root.recordWithSound()
+    }
+    GlobalShortcut {
+        name: "screenRuler"
+        description: "Opens the screen ruler tool"
+        onPressed: root.openRuler()
     }
 }

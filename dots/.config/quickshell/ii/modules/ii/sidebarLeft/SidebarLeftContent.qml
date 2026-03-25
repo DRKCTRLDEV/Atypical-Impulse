@@ -7,7 +7,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
-
 Item {
     id: root
     property var scopeRoot
@@ -16,48 +15,54 @@ Item {
     property bool translatorEnabled: Config.options.sidebar.translator.enable
     property bool mouseConfigEnabled: Config.options.sidebar.mouseConfig.enable
 
-    property var tabButtonList: [
-        ...(root.translatorEnabled ? [{"icon": "translate", "name": Translation.tr("Translator")}] : []),
-        ...(root.mouseConfigEnabled ? [{"icon": "mouse", "name": Translation.tr("Mouse")}] : [])
-    ]
-    
+    property var tabButtonList: [...(root.translatorEnabled ? [
+                {
+                    "icon": "translate",
+                    "name": Translation.tr("Translator")
+                }
+            ] : []), ...(root.mouseConfigEnabled ? [
+                {
+                    "icon": "mouse",
+                    "name": Translation.tr("Mouse")
+                }
+            ] : [])]
+
     // Control service active state based on sidebar visibility
     Connections {
         target: GlobalStates
         function onSidebarLeftOpenChanged() {
             // Activate/deactivate RivalCfg service when sidebar opens/closes
             if (root.mouseConfigEnabled) {
-                RivalCfg.active = GlobalStates.sidebarLeftOpen
+                RivalCfg.active = GlobalStates.sidebarLeftOpen;
             }
         }
     }
-    
+
     // Also set initial state when component is created
     Component.onCompleted: {
         if (root.mouseConfigEnabled && GlobalStates.sidebarLeftOpen) {
-            RivalCfg.active = true
+            RivalCfg.active = true;
         }
     }
-    
+
     // Cleanup when destroyed
     Component.onDestruction: {
         if (root.mouseConfigEnabled) {
-            RivalCfg.active = false
+            RivalCfg.active = false;
         }
     }
 
     function focusActiveItem() {
-        swipeView.currentItem.forceActiveFocus()
+        swipeView.currentItem.forceActiveFocus();
     }
 
-    Keys.onPressed: (event) => {
+    Keys.onPressed: event => {
         if (event.modifiers === Qt.ControlModifier) {
             if (event.key === Qt.Key_PageDown) {
-                swipeView.incrementCurrentIndex()
+                swipeView.incrementCurrentIndex();
                 event.accepted = true;
-            }
-            else if (event.key === Qt.Key_PageUp) {
-                swipeView.decrementCurrentIndex()
+            } else if (event.key === Qt.Key_PageUp) {
+                swipeView.decrementCurrentIndex();
                 event.accepted = true;
             }
         }
@@ -79,7 +84,6 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 tabButtonList: root.tabButtonList
                 currentIndex: swipeView.currentIndex
-                alwaysExpanded: true
             }
         }
 
@@ -107,11 +111,7 @@ Item {
                     }
                 }
 
-                contentChildren: [
-                    ...(root.translatorEnabled ? [translator.createObject()] : []),
-                    ...(root.mouseConfigEnabled ? [mouseConfig.createObject()] : []),
-                    ...((root.tabButtonList.length === 0 || (!root.translatorEnabled && !root.mouseConfigEnabled)) ? [placeholder.createObject()] : []),
-                ]
+                contentChildren: [...(root.translatorEnabled ? [translator.createObject()] : []), ...(root.mouseConfigEnabled ? [mouseConfig.createObject()] : []), ...((root.tabButtonList.length === 0 || (!root.translatorEnabled && !root.mouseConfigEnabled)) ? [placeholder.createObject()] : []),]
             }
         }
 

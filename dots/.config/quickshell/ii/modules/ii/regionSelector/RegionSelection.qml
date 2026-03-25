@@ -17,32 +17,42 @@ OverlayWindow {
     wlrNamespace: "quickshell:regionSelector"
 
     // Modes
-    enum SnipAction { Copy, Edit, Search, CharRecognition, Record, RecordWithSound } 
-    enum SelectionMode { RectCorners, Circle }
-    enum Phase { Select, Post }
+    enum SnipAction {
+        Copy,
+        Edit,
+        Search,
+        CharRecognition,
+        Record,
+        RecordWithSound
+    }
+    enum SelectionMode {
+        RectCorners,
+        Circle
+    }
+    enum RulerMode {
+        Crosshair,
+        Horizontal,
+        Vertical
+    }
+    enum Phase {
+        Select,
+        Post
+    }
     property var action: RegionSelection.SnipAction.Copy
     property var selectionMode: RegionSelection.SelectionMode.RectCorners
+    property var rulerMode: null
     property var phase: RegionSelection.Phase.Select
-    signal requestDismiss()
+    signal requestDismiss
 
-    // Styles
-    property string screenshotDir: Directories.screenshotTemp
-    property color overlayColor: ColorUtils.transparentize("#000000", 0.4)
-    property color brightText: Appearance.m3colors.darkmode ? Appearance.colors.colOnLayer0 : Appearance.colors.colLayer0
-    property color brightSecondary: Appearance.m3colors.darkmode ? Appearance.colors.colSecondary : Appearance.colors.colOnSecondary
-    property color brightTertiary: Appearance.m3colors.darkmode ? Appearance.colors.colTertiary : Qt.lighter(Appearance.colors.colPrimary)
-    property color selectionBorderColor: ColorUtils.mix(brightText, brightSecondary, 0.5)
-    property color windowBorderColor: brightSecondary
+    // Styles (overlayColor, hyprlandMonitor, monitorScale, screenshotDir inherited from OverlayWindow)
+    property color selectionBorderColor: ColorUtils.mix(Appearance.m3colors.darkmode ? Appearance.colors.colOnLayer0 : Appearance.colors.colLayer0, Appearance.m3colors.darkmode ? Appearance.colors.colSecondary : Appearance.colors.colOnSecondary, 0.5)
+    property color windowBorderColor: Appearance.m3colors.darkmode ? Appearance.colors.colSecondary : Appearance.colors.colOnSecondary
     property color windowFillColor: ColorUtils.transparentize(windowBorderColor, 0.85)
-    property color imageBorderColor: brightTertiary
-    property color imageFillColor: ColorUtils.transparentize(imageBorderColor, 0.85)
-    property color onBorderColor: "#ff000000"
     property real targetRegionOpacity: Config.options.regionSelector.targetRegions.opacity
     property bool contentRegionOpacity: Config.options.regionSelector.targetRegions.contentRegionOpacity
 
     // Vars for indicators
     readonly property var windows: [...HyprlandData.windowList].sort((a, b) => {
-        // Sort floating=true windows before others
         if (a.floating === b.floating)
             return 0;
         return a.floating ? -1 : 1;
@@ -51,8 +61,6 @@ OverlayWindow {
     readonly property real falsePositivePreventionRatio: 0.5
 
     // Screen & interaction vars
-    readonly property HyprlandMonitor hyprlandMonitor: Hyprland.monitorFor(screen)
-    readonly property real monitorScale: hyprlandMonitor.scale
     readonly property real monitorOffsetX: hyprlandMonitor.x
     readonly property real monitorOffsetY: hyprlandMonitor.y
     property int activeWorkspaceId: hyprlandMonitor.activeWorkspace?.id ?? 0
@@ -88,27 +96,62 @@ OverlayWindow {
 
     // Config
     property bool isCircleSelection: (root.selectionMode === RegionSelection.SelectionMode.Circle)
-    property bool enableWindowRegions: Config.options.regionSelector.targetRegions.windows && !isCircleSelection
-    property bool enableLayerRegions: Config.options.regionSelector.targetRegions.layers && !isCircleSelection
-    property bool enableContentRegions: Config.options.regionSelector.targetRegions.content
+    property bool enableWindowRegions: Config.options.regionSelector.targetRegions.windows && !isCircleSelection && root.rulerMode === null
+    property bool enableLayerRegions: Config.options.regionSelector.targetRegions.layers && !isCircleSelection && root.rulerMode === null
+    property bool enableContentRegions: Config.options.regionSelector.targetRegions.content && root.rulerMode === null
 
     // Target
     property real targetedRegionX: -1
     property real targetedRegionY: -1
     property real targetedRegionWidth: 0
     property real targetedRegionHeight: 0
-    function targetedRegionValid() {
-        return (root.targetedRegionX >= 0 && root.targetedRegionY >= 0);
-    }
     function isTargeted(modelData) {
         return !root.draggedAway && root.targetedRegionX === modelData.at[0] && root.targetedRegionY === modelData.at[1] && root.targetedRegionWidth === modelData.size[0] && root.targetedRegionHeight === modelData.size[1];
     }
-    function setRegionToTargeted() {
-        const padding = Config.options.regionSelector.targetRegions.selectionPadding; // Make borders not cut off n stuff
-        root.regionX = root.targetedRegionX - padding;
-        root.regionY = root.targetedRegionY - padding;
-        root.regionWidth = root.targetedRegionWidth + padding * 2;
-        root.regionHeight = root.targetedRegionHeight + padding * 2;
+
+    readonly property list<var> allRegionDescriptors: {
+        let result = [];
+        if (root.enableWindowRegions) {
+            for (const w of root.windowRegions)
+                result.push({
+                    at: w.at,
+                    size: w.size,
+                    z: 2,
+                    borderColor: root.windowBorderColor,
+                    fillColor: root.windowFillColor,
+                    opacity: root.targetRegionOpacity,
+                    text: w.class,
+                    radius: Appearance.rounding.windowRounding,
+                    showIcon: true
+                });
+        }
+        if (root.enableLayerRegions) {
+            for (const l of root.layerRegions)
+                result.push({
+                    at: l.at,
+                    size: l.size,
+                    z: 3,
+                    borderColor: root.windowBorderColor,
+                    fillColor: root.windowFillColor,
+                    opacity: root.targetRegionOpacity,
+                    text: l.namespace,
+                    radius: Appearance.rounding.windowRounding
+                });
+        }
+        if (root.enableContentRegions) {
+            const imgBorder = Appearance.m3colors.darkmode ? Appearance.colors.colTertiary : Qt.lighter(Appearance.colors.colPrimary);
+            for (const c of root.imageRegions)
+                result.push({
+                    at: c.at,
+                    size: c.size,
+                    z: 4,
+                    borderColor: imgBorder,
+                    fillColor: ColorUtils.transparentize(imgBorder, 0.85),
+                    opacity: root.contentRegionOpacity,
+                    text: Translation.tr("Content region")
+                });
+        }
+        return result;
     }
 
     function updateTargetedRegion(x, y) {
@@ -125,22 +168,23 @@ OverlayWindow {
     property real regionY: Math.min(dragStartY, draggingY)
 
     // Screenshot stuff
-    TempScreenshotProcess {
-        id: screenshotProc
-        running: true
-        screen: root.screen
-        screenshotDir: root.screenshotDir
-        screenshotPath: root.screenshotPath
-        onExited: (exitCode, exitStatus) => {
-            if (root.enableContentRegions) imageDetectionProcess.running = true;
+    Connections {
+        target: root.screenshotProcess
+        function onExited(exitCode, exitStatus) {
+            if (root.rulerMode !== null) {
+                screenRuler.screenshotReady = true;
+                screenRuler.loadScreenshot();
+            }
+            if (root.enableContentRegions)
+                imageDetectionProcess.running = true;
             root.preparationDone = !checkRecordingProc.running;
         }
     }
-    property bool isRecording: root.action === RegionSelection.SnipAction.Record || root.action === RegionSelection.SnipAction.RecordWithSound
+    readonly property bool isRecordingAction: [RegionSelection.SnipAction.Record, RegionSelection.SnipAction.RecordWithSound].includes(root.action)
     property bool recordingShouldStop: false
     Process {
         id: checkRecordingProc
-        running: isRecording
+        running: root.rulerMode === null && root.isRecordingAction
         command: ["pidof", "wf-recorder"]
         onExited: (exitCode, exitStatus) => {
             root.preparationDone = !root.screenshotProcess.running;
@@ -151,7 +195,7 @@ OverlayWindow {
     onPreparationDoneChanged: {
         if (!preparationDone)
             return;
-        if (root.isRecording && root.recordingShouldStop) {
+        if (root.rulerMode === null && root.isRecordingAction && root.recordingShouldStop) {
             Quickshell.execDetached([Directories.recordScriptPath]);
             root.requestDismiss();
             return;
@@ -170,26 +214,14 @@ OverlayWindow {
         }
     }
 
-    function getScreenshotAction() {
-        switch(root.action) {
-            case RegionSelection.SnipAction.Copy:
-                return ScreenshotAction.Action.Copy;
-            case RegionSelection.SnipAction.Edit:
-                return ScreenshotAction.Action.Edit;
-            case RegionSelection.SnipAction.Search:
-                return ScreenshotAction.Action.Search;
-            case RegionSelection.SnipAction.CharRecognition:
-                return ScreenshotAction.Action.CharRecognition;
-            case RegionSelection.SnipAction.Record:
-                return ScreenshotAction.Action.Record;
-            case RegionSelection.SnipAction.RecordWithSound:
-                return ScreenshotAction.Action.RecordWithSound;
-            default:
-                console.warn("[Region Selector] Unknown snip action, skipping snip.");
-                root.requestDismiss();
-                return;
-        }
-    }
+    readonly property var snipActionMap: ({
+            [RegionSelection.SnipAction.Copy]: ScreenshotAction.Action.Copy,
+            [RegionSelection.SnipAction.Edit]: ScreenshotAction.Action.Edit,
+            [RegionSelection.SnipAction.Search]: ScreenshotAction.Action.Search,
+            [RegionSelection.SnipAction.CharRecognition]: ScreenshotAction.Action.CharRecognition,
+            [RegionSelection.SnipAction.Record]: ScreenshotAction.Action.Record,
+            [RegionSelection.SnipAction.RecordWithSound]: ScreenshotAction.Action.RecordWithSound
+        })
 
     // Execution after selection
     function snip() {
@@ -198,31 +230,24 @@ OverlayWindow {
             root.requestDismiss();
             return;
         }
-        // Clamp region to screen bounds
         root.regionX = Math.max(0, Math.min(root.regionX, root.screen.width - root.regionWidth));
         root.regionY = Math.max(0, Math.min(root.regionY, root.screen.height - root.regionHeight));
         root.regionWidth = Math.max(0, Math.min(root.regionWidth, root.screen.width - root.regionX));
         root.regionHeight = Math.max(0, Math.min(root.regionHeight, root.screen.height - root.regionY));
-        // Adjust action: right-click → edit
         if (root.action === RegionSelection.SnipAction.Copy || root.action === RegionSelection.SnipAction.Edit) {
             root.action = root.mouseButton === Qt.RightButton ? RegionSelection.SnipAction.Edit : RegionSelection.SnipAction.Copy;
         }
-        
-        const screenshotDir = Config.options.screenSnip.savePath !== "" ? //
-            Config.options.screenSnip.savePath : "";
-        var screenshotAction = root.getScreenshotAction();
-        const command = ScreenshotAction.getCommand(
-            root.regionX * root.monitorScale, //
-            root.regionY * root.monitorScale, //
-            root.regionWidth * root.monitorScale,// 
-            root.regionHeight * root.monitorScale, //
-            root.screenshotPath, //
-            screenshotAction, //
-            screenshotDir
-        )
+
+        const screenshotAction = root.snipActionMap[root.action];
+        if (screenshotAction === undefined) {
+            console.warn("[Region Selector] Unknown snip action, skipping snip.");
+            root.requestDismiss();
+            return;
+        }
+        const command = ScreenshotAction.getCommand(root.regionX * root.monitorScale, root.regionY * root.monitorScale, root.regionWidth * root.monitorScale, root.regionHeight * root.monitorScale, root.screenshotPath, screenshotAction, Config.options.screenSnip.savePath || "");
         Quickshell.execDetached(command);
-        if (root.action == RegionSelection.SnipAction.Record || root.action == RegionSelection.SnipAction.RecordWithSound) {
-            root.phase = RegionSelection.Phase.Post
+        if (root.isRecordingAction) {
+            root.phase = RegionSelection.Phase.Post;
         } else {
             root.requestDismiss();
         }
@@ -230,22 +255,27 @@ OverlayWindow {
 
     // Only clickable in Selection phase
     mask: Region {
-        item: switch(root.phase) {
-            case RegionSelection.Phase.Select: return mouseArea;
-            case RegionSelection.Phase.Post: return null;
-        }
+        item: root.phase === RegionSelection.Phase.Select ? mouseArea : null
     }
 
-    ScreencopyView { // For freezing
+    ScreencopyView {
+        // For freezing
         anchors.fill: parent
         live: false
         captureSource: root.screen
         visible: root.phase === RegionSelection.Phase.Select
 
         focus: root.visible
-        Keys.onPressed: event => { // Esc to close
+        readonly property var rulerKeyMap: ({
+                [Qt.Key_1]: RegionSelection.RulerMode.Crosshair,
+                [Qt.Key_2]: RegionSelection.RulerMode.Horizontal,
+                [Qt.Key_3]: RegionSelection.RulerMode.Vertical
+            })
+        Keys.onPressed: event => {
             if (event.key === Qt.Key_Escape) {
                 root.requestDismiss();
+            } else if (root.rulerMode !== null && event.key in rulerKeyMap) {
+                root.rulerMode = rulerKeyMap[event.key];
             }
         }
     }
@@ -253,30 +283,49 @@ OverlayWindow {
     MouseArea {
         id: mouseArea
         anchors.fill: parent
-        cursorShape: Qt.CrossCursor
+        cursorShape: root.rulerMode !== null ? Qt.BlankCursor : Qt.CrossCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         hoverEnabled: true
+        focus: root.rulerMode !== null && root.visible
 
-        // Controls
-        onPressed: (mouse) => {
-            root.dragStartX = mouse.x;
-            root.dragStartY = mouse.y;
-            root.draggingX = mouse.x;
-            root.draggingY = mouse.y;
-            root.dragging = true;
+        onPressed: mouse => {
+            if (mouse.button === Qt.RightButton && root.rulerMode !== null) {
+                root.requestDismiss();
+                return;
+            }
+            if (root.rulerMode === null) {
+                root.dragStartX = mouse.x;
+                root.dragStartY = mouse.y;
+                root.draggingX = mouse.x;
+                root.draggingY = mouse.y;
+                root.dragging = true;
+            }
             root.mouseButton = mouse.button;
         }
-        onReleased: (mouse) => {
+        onReleased: mouse => {
+            if (root.rulerMode !== null) {
+                mouseArea.forceActiveFocus();
+                return;
+            }
             // Detect if it was a click -> Try to select targeted region
             if (root.draggingX === root.dragStartX && root.draggingY === root.dragStartY) {
-                if (root.targetedRegionValid()) {
-                    root.setRegionToTargeted();
+                if (root.targetedRegionX >= 0 && root.targetedRegionY >= 0) {
+                    const pad = Config.options.regionSelector.targetRegions.selectionPadding;
+                    root.regionX = root.targetedRegionX - pad;
+                    root.regionY = root.targetedRegionY - pad;
+                    root.regionWidth = root.targetedRegionWidth + pad * 2;
+                    root.regionHeight = root.targetedRegionHeight + pad * 2;
                 }
-            }
+            } else
             // Circle dragging?
-            else if (root.selectionMode === RegionSelection.SelectionMode.Circle) {
+            if (root.selectionMode === RegionSelection.SelectionMode.Circle) {
                 const padding = Config.options.regionSelector.circle.padding + Config.options.regionSelector.circle.strokeWidth / 2;
-                const dragPoints = (root.points.length > 0) ? root.points : [{ x: mouseArea.mouseX, y: mouseArea.mouseY }];
+                const dragPoints = (root.points.length > 0) ? root.points : [
+                    {
+                        x: mouseArea.mouseX,
+                        y: mouseArea.mouseY
+                    }
+                ];
                 const maxX = Math.max(...dragPoints.map(p => p.x));
                 const minX = Math.min(...dragPoints.map(p => p.x));
                 const maxY = Math.max(...dragPoints.map(p => p.y));
@@ -288,20 +337,72 @@ OverlayWindow {
             }
             root.snip();
         }
-        onPositionChanged: (mouse) => {
-            root.updateTargetedRegion(mouse.x, mouse.y);
-            if (!root.dragging) return;
-            root.draggingX = mouse.x;
-            root.draggingY = mouse.y;
-            root.dragDiffX = mouse.x - root.dragStartX;
-            root.dragDiffY = mouse.y - root.dragStartY;
-            root.points.push({ x: mouse.x, y: mouse.y });
+        onPositionChanged: mouse => {
+            if (root.rulerMode !== null) {
+                screenRuler.requestScan(mouse.x, mouse.y);
+            } else {
+                root.updateTargetedRegion(mouse.x, mouse.y);
+                if (!root.dragging)
+                    return;
+                root.draggingX = mouse.x;
+                root.draggingY = mouse.y;
+                root.dragDiffX = mouse.x - root.dragStartX;
+                root.dragDiffY = mouse.y - root.dragStartY;
+                root.points.push({
+                    x: mouse.x,
+                    y: mouse.y
+                });
+            }
         }
-        
+        onWheel: wheel => {
+            if (root.rulerMode === null)
+                return;
+            const step = (wheel.modifiers & Qt.ControlModifier) ? 10 : 1;
+            const delta = wheel.angleDelta.y > 0 ? step : -step;
+            screenRuler.adjustTolerance(delta, mouseArea.mouseX, mouseArea.mouseY);
+        }
+
+        // === Screen ruler (edge detection) ===
+
+        ScreenRuler {
+            id: screenRuler
+            screenWidth: root.width
+            screenHeight: root.height
+            monitorScale: root.monitorScale
+            screenshotPath: root.screenshotPath
+        }
+
+        // === Ruler overlay ===
+
+        Rectangle {
+            z: 1
+            anchors.fill: parent
+            visible: root.rulerMode !== null
+            color: root.overlayColor
+        }
+
+        // === Unified aimlines (ruler measurements + selection guides) ===
+
+        Aimlines {
+            id: aimlines
+            z: 2
+            anchors.fill: parent
+            edges: screenRuler.edges
+            mouseX: mouseArea.mouseX
+            mouseY: mouseArea.mouseY
+            color: root.selectionBorderColor
+            rulerLineColor: Appearance.m3colors.darkmode ? Appearance.colors.colOnLayer0 : Appearance.colors.colLayer0
+            rulerMode: root.rulerMode
+            breathingBorderOnly: root.phase === RegionSelection.Phase.Post
+            showAimLines: Config.options.regionSelector.rect.aimLines
+        }
+
+        // === Region selector visuals ===
+
         Loader {
             z: 2
             anchors.fill: parent
-            active: root.selectionMode === RegionSelection.SelectionMode.RectCorners
+            active: root.rulerMode === null && root.selectionMode === RegionSelection.SelectionMode.RectCorners
             sourceComponent: RectCornersSelectionDetails {
                 regionX: root.regionX
                 regionY: root.regionY
@@ -318,7 +419,7 @@ OverlayWindow {
         Loader {
             z: 2
             anchors.fill: parent
-            active: root.selectionMode === RegionSelection.SelectionMode.Circle
+            active: root.rulerMode === null && root.selectionMode === RegionSelection.SelectionMode.Circle
             sourceComponent: CircleSelectionDetails {
                 color: root.selectionBorderColor
                 overlayColor: root.overlayColor
@@ -326,100 +427,30 @@ OverlayWindow {
             }
         }
 
-        // The thing to the bottom-right with an icon
         CursorGuide {
             z: 9999
             visible: root.phase === RegionSelection.Phase.Select
-            x: root.dragging ? root.regionX + root.regionWidth : mouseArea.mouseX
-            y: root.dragging ? root.regionY + root.regionHeight : mouseArea.mouseY
+            displayText: root.rulerMode !== null ? aimlines.measurementText : ""
+            x: mouseArea.mouseX
+            y: mouseArea.mouseY
             action: root.action
             selectionMode: root.selectionMode
         }
 
-        // Window regions
+        // Target regions (windows, layers, content)
         Repeater {
-            model: ScriptModel {
-                values: {
-                    if (root.phase === RegionSelection.Phase.Select && root.enableWindowRegions) {
-                        return root.windowRegions
-                    } else {
-                        return []
-                    }
-                }
-            }
+            model: (root.phase === RegionSelection.Phase.Select) ? root.allRegionDescriptors : []
             delegate: TargetRegion {
-                z: 2
                 required property var modelData
+                z: modelData.z
                 clientDimensions: modelData
-                showIcon: true
-                targeted: !root.draggedAway && //
-                    (root.targetedRegionX === modelData.at[0]  //
-                    && root.targetedRegionY === modelData.at[1] //
-                    && root.targetedRegionWidth === modelData.size[0] //
-                    && root.targetedRegionHeight === modelData.size[1])
-
-                opacity: root.draggedAway ? 0 : root.targetRegionOpacity
-                borderColor: root.windowBorderColor
-                fillColor: targeted ? root.windowFillColor : "transparent"
-                text: `${modelData.class}`
-                radius: Appearance.rounding.windowRounding
-            }
-        }
-
-        // Layer regions
-        Repeater {
-            model: ScriptModel {
-                values: {
-                    if (root.phase === RegionSelection.Phase.Select && root.enableLayerRegions) {
-                        return root.layerRegions
-                    } else {
-                        return []
-                    }
-                }
-            }
-            delegate: TargetRegion {
-                z: 3
-                required property var modelData
-                clientDimensions: modelData
-                targeted: !root.draggedAway &&
-                    (root.targetedRegionX === modelData.at[0] 
-                    && root.targetedRegionY === modelData.at[1]
-                    && root.targetedRegionWidth === modelData.size[0]
-                    && root.targetedRegionHeight === modelData.size[1])
-
-                opacity: root.draggedAway ? 0 : root.targetRegionOpacity
-                borderColor: root.windowBorderColor
-                fillColor: targeted ? root.windowFillColor : "transparent"
-                text: `${modelData.namespace}`
-                radius: Appearance.rounding.windowRounding
-            }
-        }
-
-        // Content regions
-        Repeater {
-            model: ScriptModel {
-                values: {
-                    if (root.phase === RegionSelection.Phase.Select && root.enableContentRegions) {
-                        return root.imageRegions
-                    } else {
-                        return []
-                    }
-                }
-            }
-            delegate: TargetRegion {
-                z: 4
-                required property var modelData
-                clientDimensions: modelData
-                targeted: !root.draggedAway &&
-                    (root.targetedRegionX === modelData.at[0] 
-                    && root.targetedRegionY === modelData.at[1]
-                    && root.targetedRegionWidth === modelData.size[0]
-                    && root.targetedRegionHeight === modelData.size[1])
-
-                opacity: root.draggedAway ? 0 : root.contentRegionOpacity
-                borderColor: root.imageBorderColor
-                fillColor: targeted ? root.imageFillColor : "transparent"
-                text: Translation.tr("Content region")
+                showIcon: modelData.showIcon ?? false
+                targeted: root.isTargeted(modelData)
+                opacity: root.draggedAway ? 0 : modelData.opacity
+                borderColor: modelData.borderColor
+                fillColor: targeted ? modelData.fillColor : "transparent"
+                text: modelData.text
+                radius: modelData.radius ?? 4
             }
         }
 
@@ -437,7 +468,8 @@ OverlayWindow {
             Connections {
                 target: root
                 function onVisibleChanged() {
-                    if (!visible) return;
+                    if (!visible)
+                        return;
                     regionSelectionControls.anchors.bottomMargin = 8;
                     regionSelectionControls.opacity = 1;
                 }
@@ -457,7 +489,11 @@ OverlayWindow {
                 Synchronizer on selectionMode {
                     property alias source: root.selectionMode
                 }
+                Synchronizer on rulerMode {
+                    property alias source: root.rulerMode
+                }
             }
+
             Item {
                 anchors {
                     verticalCenter: parent.verticalCenter
@@ -472,7 +508,7 @@ OverlayWindow {
                     id: closeFab
                     baseSize: 48
                     iconText: "close"
-                    onClicked: root.requestDismiss();
+                    onClicked: root.requestDismiss()
                     StyledToolTip {
                         text: Translation.tr("Close")
                     }
@@ -483,6 +519,52 @@ OverlayWindow {
                 }
             }
         }
-        
+
+        // Tolerance indicator pill (ruler mode)
+        Item {
+            id: tolPill
+            z: 10
+            visible: root.rulerMode !== null && opacity > 0
+            opacity: screenRuler.tolIndicatorVisible ? 1 : 0
+            anchors {
+                verticalCenter: regionSelectionControls.verticalCenter
+                right: regionSelectionControls.left
+                rightMargin: 6
+            }
+            implicitWidth: Math.max(implicitHeight, tolDigit.implicitWidth + 24)
+            implicitHeight: 56
+
+            Behavior on opacity {
+                animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
+            }
+            Behavior on implicitWidth {
+                NumberAnimation {
+                    duration: Appearance.animation.elementMoveFast.duration
+                    easing.type: Appearance.animation.elementMoveFast.type
+                    easing.bezierCurve: Appearance.animation.elementMoveFast.bezierCurve
+                }
+            }
+
+            StyledRectangularShadow {
+                target: tolPillBg
+                anchors.fill: tolPillBg
+            }
+
+            Rectangle {
+                id: tolPillBg
+                anchors.fill: parent
+                radius: height / 2
+                color: Appearance.m3colors.m3surfaceContainer
+
+                StyledText {
+                    id: tolDigit
+                    anchors.centerIn: parent
+                    font.family: Appearance.font.family.monospace
+                    font.pixelSize: Appearance.font.pixelSize.small
+                    color: Appearance.colors.colOnLayer0
+                    text: Math.round(screenRuler.liveTolerance).toString()
+                }
+            }
+        }
     }
 }

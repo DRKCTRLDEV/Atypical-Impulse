@@ -533,24 +533,24 @@ ContentPage {
             ConfigSpinBox {
                 buttonIcon: "straighten"
                 text: Translation.tr("Default mode")
-                value: Config.options.screenRuler.defaultMode
+                value: Config.options.regionSelector.screenRuler.defaultMode
                 from: 0
-                to: 4
+                to: 2
                 stepSize: 1
                 onValueChanged: {
-                    Config.options.screenRuler.defaultMode = value;
+                    Config.options.regionSelector.screenRuler.defaultMode = value;
                 }
                 StyledToolTip {
-                    text: Translation.tr("0=Crosshair, 1=Horizontal, 2=Vertical, 3=Triangle, 4=Rectangle")
+                    text: Translation.tr("0=Crosshair, 1=Horizontal, 2=Vertical")
                 }
             }
 
             ConfigSwitch {
                 buttonIcon: "videocam"
                 text: Translation.tr("Continuous capture")
-                checked: Config.options.screenRuler.continuousCapture
+                checked: Config.options.regionSelector.screenRuler.continuousCapture
                 onCheckedChanged: {
-                    Config.options.screenRuler.continuousCapture = checked;
+                    Config.options.regionSelector.screenRuler.continuousCapture = checked;
                 }
                 StyledToolTip {
                     text: Translation.tr("Continuously re-grab the screen while the ruler is open")
@@ -564,12 +564,12 @@ ContentPage {
             ConfigSpinBox {
                 buttonIcon: "tune"
                 text: Translation.tr("Edge tolerance")
-                value: Config.options.screenRuler.edgeTolerance
+                value: Config.options.regionSelector.screenRuler.edgeTolerance
                 from: 0
                 to: 255
                 stepSize: 5
                 onValueChanged: {
-                    Config.options.screenRuler.edgeTolerance = value;
+                    Config.options.regionSelector.screenRuler.edgeTolerance = value;
                 }
                 StyledToolTip {
                     text: Translation.tr("Pixel colour difference threshold for edge detection. Lower = more sensitive. Default: 30")
@@ -579,9 +579,9 @@ ContentPage {
             ConfigSwitch {
                 buttonIcon: "palette"
                 text: Translation.tr("Per-channel edge comparison")
-                checked: Config.options.screenRuler.perChannelEdge
+                checked: Config.options.regionSelector.screenRuler.perChannelEdge
                 onCheckedChanged: {
-                    Config.options.screenRuler.perChannelEdge = checked;
+                    Config.options.regionSelector.screenRuler.perChannelEdge = checked;
                 }
                 StyledToolTip {
                     text: Translation.tr("Compare R, G, B channels individually instead of summed difference")

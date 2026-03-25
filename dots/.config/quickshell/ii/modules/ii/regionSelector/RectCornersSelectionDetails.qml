@@ -12,7 +12,6 @@ Item {
     required property real mouseY
     required property color color
     required property color overlayColor
-    property bool showAimLines: Config.options.regionSelector.rect.aimLines
 
     property bool breathingBorderOnly: false
 
@@ -57,8 +56,18 @@ Item {
         SequentialAnimation on opacity {
             running: root.breathingBorderOnly
             loops: Animation.Infinite
-            NumberAnimation { from: 0.9; to: 0.3; duration: 1200; easing.type: Easing.InOutQuad }
-            NumberAnimation { from: 0.3; to: 0.9; duration: 1200; easing.type: Easing.InOutQuad }
+            NumberAnimation {
+                from: 0.9
+                to: 0.3
+                duration: 1200
+                easing.type: Easing.InOutQuad
+            }
+            NumberAnimation {
+                from: 0.3
+                to: 0.9
+                duration: 1200
+                easing.type: Easing.InOutQuad
+            }
         }
     }
 
@@ -72,31 +81,5 @@ Item {
         }
         color: root.color
         text: `${Math.round(root.regionWidth)} x ${Math.round(root.regionHeight)}`
-    }
-
-    // Coord lines
-    Rectangle { // Vertical
-        visible: root.showAimLines && !root.breathingBorderOnly
-        opacity: 0.2
-        z: 2
-        x: root.mouseX
-        anchors {
-            top: parent.top
-            bottom: parent.bottom
-        }
-        width: 1
-        color: root.color
-    }
-    Rectangle { // Horizontal
-        visible: root.showAimLines && !root.breathingBorderOnly
-        opacity: 0.2
-        z: 2
-        y: root.mouseY
-        anchors {
-            left: parent.left
-            right: parent.right
-        }
-        height: 1
-        color: root.color
     }
 }

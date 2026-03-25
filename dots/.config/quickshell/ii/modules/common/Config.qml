@@ -371,13 +371,12 @@ Singleton {
                 property JsonObject annotation: JsonObject {
                     property bool satty: false
                 }
-            }
-
-            property JsonObject screenRuler: JsonObject {
-                property int defaultMode: 0 // 0=Crosshair, 1=Horizontal, 2=Vertical, 3=Triangle, 4=Square
-                property bool continuousCapture: false
-                property bool perChannelEdge: false
-                property int edgeTolerance: 30 // 0-255
+                property JsonObject screenRuler: JsonObject {
+                    property int defaultMode: 0 // 0=Crosshair, 1=Horizontal, 2=Vertical
+                    property bool continuousCapture: false
+                    property bool perChannelEdge: false
+                    property int edgeTolerance: 30 // 0-255
+                }
             }
 
             property JsonObject resources: JsonObject {

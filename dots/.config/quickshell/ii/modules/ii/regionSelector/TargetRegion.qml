@@ -8,8 +8,8 @@ import Quickshell.Widgets
 
 Rectangle {
     id: root
-    required property var clientDimensions
 
+    required property var clientDimensions
     property color colBackground: Qt.alpha("#88111111", 0.9)
     property color colForeground: "#ddffffff"
     property bool showLabel: Config.options.regionSelector.targetRegions.showLabel
@@ -19,37 +19,36 @@ Rectangle {
     property color fillColor: "transparent"
     property string text: ""
     property real textPadding: 10
+
     z: 2
     color: fillColor
     border.color: borderColor
     border.width: targeted ? 4 : 2
     radius: 4
-
-    Behavior on color {
-        animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(this)
-    }
-
     visible: opacity > 0
-    Behavior on opacity {
-        animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-    }
+
     x: clientDimensions.at[0]
     y: clientDimensions.at[1]
     width: clientDimensions.size[0]
     height: clientDimensions.size[1]
 
+    Behavior on color {
+        animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(root)
+    }
+
+    Behavior on opacity {
+        animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(root)
+    }
+
     Loader {
-        anchors {
-            top: parent.top
-            left: parent.left
-            topMargin: root.textPadding
-            leftMargin: root.textPadding
-        }
-        
+        x: root.textPadding
+        y: root.textPadding
         active: root.showLabel
+
         sourceComponent: Rectangle {
-            property real verticalPadding: 5
-            property real horizontalPadding: 10
+            readonly property real verticalPadding: 5
+            readonly property real horizontalPadding: 10
+
             radius: 10
             color: root.colBackground
             border.width: 1
@@ -62,18 +61,13 @@ Rectangle {
                 anchors.centerIn: parent
                 spacing: 4
 
-                Loader {
-                    id: regionIconLoader
-                    active: root.showIcon
-                    visible: active
-                    sourceComponent: IconImage {
-                        implicitSize: Appearance.font.pixelSize.larger
-                        source: Quickshell.iconPath(AppSearch.guessIcon(root.text), "image-missing")
-                    }
+                IconImage {
+                    visible: root.showIcon
+                    implicitSize: Appearance.font.pixelSize.larger
+                    source: root.showIcon ? Quickshell.iconPath(AppSearch.guessIcon(root.text), "image-missing") : ""
                 }
 
                 StyledText {
-                    id: regionText
                     text: root.text
                     color: root.colForeground
                 }
